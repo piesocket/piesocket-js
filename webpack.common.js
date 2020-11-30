@@ -6,5 +6,5 @@ module.exports = {
         path: path.resolve(__dirname, 'dist'),
         filename: 'piesocket.js',
         library: 'PieSocket'
-    },
+    }
 };

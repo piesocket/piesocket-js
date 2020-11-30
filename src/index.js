@@ -1,3 +1,1 @@
-import PieSocket from './PieSocket'
-
-module.exports = PieSocket;
+module.exports = require('./PieSocket').default;
