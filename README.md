@@ -31,5 +31,3 @@ Other supported events are:
   
 
 For a full list of supported events and properties, refer to [this guide](https://piesocke.com/websocket)
-
-The WebSocket connection will auto
