@@ -24,8 +24,8 @@ channel.on('message', function(msg){
 });
 ```
 
-Other supported events are:
-  - `open`
+Following are the supported events:
+  - `message`
   - `close`
   - `error`
   
