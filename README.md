@@ -17,7 +17,7 @@ var channel = piesocket.subscribe(channelId); //channelId can any integere b/w 1
 ```
 
 
-Listen to messages/events
+Listen to message event
 ```javascript
 channel.on('message', function(msg){
     console.log(msg);
