@@ -5,8 +5,8 @@
 Initialize the Piesocket class
 ```javascript
 var piesocket = new Piesocket({
-    cluster_id:'us-nyc-1',
-    api_key: 'YOUR_API_KEY_HERE'    
+    cluster_id: 'YOUR_CLUSTER_ID',
+    api_key: 'YOUR_API_KEY'    
 });
 ```
 
