@@ -13,7 +13,7 @@ var piesocket = new PieSocket({
 
 Subscribe to a channel
 ```javascript
-var channel = piesocket.subscribe(channelId); //channelId can any integere b/w 1-100000
+var channel = piesocket.subscribe(channelId); //channelId = any integere b/w 1-100000
 ```
 
 
