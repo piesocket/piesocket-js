@@ -49,12 +49,17 @@
         //Initiate PieSocket
         var piesocket = new PieSocket({
             cluster_id: 'demo',
-            api_key: 'oCdCMcMPQpbvNjUIzqtvF1d2X2okWpDQj4AwARJuAgtjhzKxVEjQU6IdCjwm'
+            api_key: 'oCdCMcMPQpbvNjUIzqtvF1d2X2okWpDQj4AwARJuAgtjhzKxVEjQU6IdCjwm',
+            showLogs: true
         });
 
         subscribeBtn.addEventListener('click', function(e) {
             e.preventDefault();
             var channelId = channelIdInput.value;
+
+            if (!channelId) {
+                return;
+            }
 
             logArea.append(`- Subscribing to channel: ${channelId} \n`);
 

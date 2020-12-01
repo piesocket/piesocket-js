@@ -1,3 +1,5 @@
+import Logger from './Logger';
+
 export default class Channel {
 
     constructor(endpoint, identity) {
@@ -5,6 +7,7 @@ export default class Channel {
         this.identity = identity;
         this.connection = this.connect();
         this.events = {};
+        this.logger = new Logger(identity);
     }
 
     connect() {
@@ -24,7 +27,7 @@ export default class Channel {
 
 
     onMessage(e) {
-        console.log('Channel message:', e);
+        this.logger.log('Channel message:', e);
 
         //User defined callback
         if (this.events['message']) {
@@ -33,7 +36,7 @@ export default class Channel {
     }
 
     onOpen(e) {
-        console.log('Channel connected:', e);
+        this.logger.log('Channel connected:', e);
 
         //User defined callback
         if (this.events['open']) {
@@ -42,7 +45,7 @@ export default class Channel {
     }
 
     onError(e) {
-        console.error('Channel error:', e);
+        this.logger.error('Channel error:', e);
         this.connection.close();
 
         //User defined callback
@@ -52,7 +55,7 @@ export default class Channel {
     }
 
     onClose(e) {
-        console.warn('Channel closed:', e);
+        this.logger.warn('Channel closed:', e);
         this.reconnect();
 
         //User defined callback
@@ -62,7 +65,7 @@ export default class Channel {
     }
 
     reconnect() {
-        console.log("Reconnecting");
+        this.logger.log("Reconnecting");
         this.connect();
     }
 
