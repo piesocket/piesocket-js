@@ -24,7 +24,10 @@ export default class PieSocket {
         }
 
         console.log("Creating new channel", endpoint);
-        var channel = new Channel(endpoint);
+        var channel = new Channel(endpoint, {
+            channelId: channelId,
+            ...this.options
+        });
         this.connections[channelId] = channel;
         return channel;
     }

@@ -1,7 +1,8 @@
 export default class Channel {
 
-    constructor(endpoint) {
+    constructor(endpoint, identity) {
         this.endpoint = endpoint;
+        this.identity = identity;
         this.connection = this.connect();
         this.events = {};
     }
@@ -23,48 +24,39 @@ export default class Channel {
 
 
     onMessage(e) {
-        e = this.modifyEvent(e);
         console.log('Channel message:', e);
 
         //User defined callback
         if (this.events['message']) {
-            this.events['message'](e);
+            this.events['message'].bind(this)(e);
         }
     }
 
     onOpen(e) {
-        e = this.modifyEvent(e);
         console.log('Channel connected:', e);
 
         //User defined callback
         if (this.events['open']) {
-            this.events['open'](e);
+            this.events['open'].bind(this)(e);
         }
     }
 
     onError(e) {
-        e = this.modifyEvent(e);
         console.error('Channel error:', e);
 
         //User defined callback
         if (this.events['error']) {
-            this.events['error'](e);
+            this.events['error'].bind(this)(e);
         }
     }
 
     onClose(e) {
-        e = this.modifyEvent(e);
         console.warn('Channel closed:', e);
 
         //User defined callback
         if (this.events['close']) {
-            this.events['close'](e);
+            this.events['close'].bind(this)(e);
         }
-    }
-
-    modifyEvent(e) {
-        e.channelId = this.channelId;
-        return e;
     }
 
 

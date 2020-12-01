@@ -4,14 +4,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PieSocket PubSub Example</title>
+    <title>PieSocket Javascript Client</title>
+
+    <!-- UIkit CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.5.10/dist/css/uikit.min.css" />
+
 </head>
 
 <body>
 
 
 
+    <div class="uk-container uk-padding-large">
+        <form>
+            <fieldset class="uk-fieldset">
+
+                <legend class="uk-legend">PieSocket Javascript Client Demo</legend>
+
+                <div class="uk-margin">
+                    <input id="channel-id-input" class="uk-input" type="number" min="1" max="100000" placeholder="Enter channel ID (1-100000)">
+                </div>
+                <div class="uk-margin">
+                    <button id="subscribe-btn" class="uk-button uk-button-primary">Subscribe</button>
+                </div>
+
+
+                <div class="uk-margin">
+                    <label class="uk-margin-small-bottom">Logs</label>
+                    <textarea id="log-area" class="uk-textarea" rows="10" placeholder="Textarea"></textarea>
+                </div>
+
+            </fieldset>
+        </form>
+    </div>
+
     <script src="/dist/piesocket.js"></script>
+    <script>
+        //Initiate UI 
+        var channelIdInput = document.getElementById('channel-id-input');
+        var subscribeBtn = document.getElementById('subscribe-btn');
+        var logArea = document.getElementById('log-area');
+
+
+        //Initiate PieSocket
+        var piesocket = new PieSocket({
+            cluster_id: 'demo',
+            api_key: 'oCdCMcMPQpbvNjUIzqtvF1d2X2okWpDQj4AwARJuAgtjhzKxVEjQU6IdCjwm'
+        });
+
+        subscribeBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            var channelId = channelIdInput.value;
+
+            logArea.append(`- Subscribing to channel: ${channelId} \n`);
+
+            //Subscribe to a channel
+            var channel = piesocket.subscribe(channelId);
+
+            //Register events
+            channel.on('open', function() {
+                logArea.append(`- Subscribed successfully to channel: ${channelId} \n`);
+                logArea.append(`-- You can now send messages to this channel from https://www.piesocket.com/websocket-tester or your server.\n`)
+            });
+            channel.on('message', function(e) {
+                logArea.append(`- New message on channel ${this.identity.channelId} : ${e.data} \n`);
+            });
+        })
+    </script>
 </body>
 
 </html>
