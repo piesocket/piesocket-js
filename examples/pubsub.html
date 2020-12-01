@@ -61,7 +61,7 @@
             //Subscribe to a channel
             var channel = piesocket.subscribe(channelId);
 
-            //Register events
+            //Register event callbacks
             channel.on('open', function() {
                 logArea.append(`- Subscribed successfully to channel: ${channelId} \n`);
                 logArea.append(`-- You can now send messages to this channel from https://www.piesocket.com/websocket-tester or your server.\n`)
