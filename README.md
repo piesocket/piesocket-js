@@ -1,6 +1,6 @@
 # PieSocket Javascript Client
 
-## Usage
+## Usage 
 
 Initialize the PieSocket class
 ```javascript

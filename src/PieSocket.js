@@ -17,6 +17,7 @@ export default class PieSocket {
 
     subscribe(channelId) {
         var endpoint = this.getEndpoint(channelId);
+
         if (this.connections[channelId]) {
             console.log("Returning existing channel", endpoint);
             return this.connections[channelId];

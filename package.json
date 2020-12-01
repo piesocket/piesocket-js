@@ -3,6 +3,7 @@
     "version": "1.0.0",
     "description": "PieSocket Javascript Client",
     "main": "src/index.js",
+    "unpkg": "dist/piesocket.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "start": "webpack --mode=development --config webpack.dev.js serve",
