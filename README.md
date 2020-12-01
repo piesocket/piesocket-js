@@ -27,9 +27,10 @@ channel.on('message', function(msg){
 ```
 
 Following are the supported events:
+  - `open`
   - `message`
-  - `close`
   - `error`
+  - `close`
   
 
 For a full list of supported events and properties, refer to [this guide](https://piesocke.com/websocket)
