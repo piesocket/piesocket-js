@@ -43,6 +43,7 @@ export default class Channel {
 
     onError(e) {
         console.error('Channel error:', e);
+        this.connection.close();
 
         //User defined callback
         if (this.events['error']) {
@@ -52,11 +53,17 @@ export default class Channel {
 
     onClose(e) {
         console.warn('Channel closed:', e);
+        this.reconnect();
 
         //User defined callback
         if (this.events['close']) {
             this.events['close'].bind(this)(e);
         }
+    }
+
+    reconnect() {
+        console.log("Reconnecting");
+        this.connect();
     }
 
 
