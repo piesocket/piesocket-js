@@ -1,13 +1,14 @@
 {
     "name": "piesocket-js",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "PieSocket Javascript Client",
-    "main": "src/index.js",
+    "main": "dist/piesocket.js",
     "unpkg": "dist/piesocket.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "start": "webpack --mode=development --config webpack.dev.js serve",
         "build": "webpack --mode=production --config webpack.prod.js",
+        "prepare": "webpack --mode=production --config webpack.prod.js",
         "watch": "webpack --mode=development --config webpack.dev.js --watch"
     },
     "repository": {
