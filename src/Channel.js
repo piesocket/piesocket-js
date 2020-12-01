@@ -63,7 +63,7 @@ export default class Channel {
     }
 
     modifyEvent(e) {
-        e.channelID = this.channelID;
+        e.channelId = this.channelId;
         return e;
     }
 
