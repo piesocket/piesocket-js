@@ -2,7 +2,7 @@
     "name": "piesocket-js",
     "version": "1.0.1",
     "description": "PieSocket Javascript Client",
-    "main": "dist/piesocket.js",
+    "main": "src/index.js",
     "unpkg": "dist/piesocket.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
