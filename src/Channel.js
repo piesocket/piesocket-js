@@ -23,7 +23,7 @@ export default class Channel {
 
 
     onMessage(e) {
-        this.modifyEvent(e);
+        e = this.modifyEvent(e);
         console.log('Channel message:', e);
 
         //User defined callback
@@ -33,7 +33,7 @@ export default class Channel {
     }
 
     onOpen(e) {
-        this.modifyEvent(e);
+        e = this.modifyEvent(e);
         console.log('Channel connected:', e);
 
         //User defined callback
@@ -43,7 +43,7 @@ export default class Channel {
     }
 
     onError(e) {
-        this.modifyEvent(e);
+        e = this.modifyEvent(e);
         console.error('Channel error:', e);
 
         //User defined callback
@@ -53,6 +53,7 @@ export default class Channel {
     }
 
     onClose(e) {
+        e = this.modifyEvent(e);
         console.warn('Channel closed:', e);
 
         //User defined callback
