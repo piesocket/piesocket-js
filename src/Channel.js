@@ -7,6 +7,7 @@ export default class Channel {
         this.identity = identity;
         this.connection = this.connect();
         this.events = {};
+        this.shouldReconnect = true;
         this.logger = new Logger(identity);
     }
 
@@ -28,6 +29,11 @@ export default class Channel {
 
     onMessage(e) {
         this.logger.log('Channel message:', e);
+
+        var message = JSON.parse(e.data);
+        if (message.error.length) {
+            this.shouldReconnect = false;
+        }
 
         //User defined callback
         if (this.events['message']) {
@@ -65,6 +71,9 @@ export default class Channel {
     }
 
     reconnect() {
+        if (!this.shouldReconnect) {
+            return;
+        }
         this.logger.log("Reconnecting");
         this.connect();
     }
