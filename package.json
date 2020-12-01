@@ -8,7 +8,7 @@
         "test": "echo \"Error: no test specified\" && exit 1",
         "start": "webpack --mode=development --config webpack.dev.js serve",
         "build": "webpack --mode=production --config webpack.prod.js",
-        "prepare": "webpack --mode=production --config webpack.prod.js",
+        "prepare": "npm run build",
         "watch": "webpack --mode=development --config webpack.dev.js --watch"
     },
     "repository": {
