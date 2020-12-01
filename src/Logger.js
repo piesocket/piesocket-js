@@ -5,19 +5,19 @@ export default class Logger {
     }
 
     log(...data) {
-        if (this.options.showLogs) {
+        if (this.options.consoleLogs) {
             console.log(...data);
         }
     }
 
     warn(...data) {
-        if (this.options.showLogs) {
+        if (this.options.consoleLogs) {
             console.warn(...data);
         }
     }
 
     error(...data) {
-        if (this.options.showLogs) {
+        if (this.options.consoleLogs) {
             console.error(...data);
         }
     }
