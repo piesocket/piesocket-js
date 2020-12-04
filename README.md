@@ -31,6 +31,8 @@ import PieSocket from 'piesocket-js';
 ```
 
 With CDN/Browser:
+
+
 Use the `PieSocket` global variable
 
 ## Usage 
@@ -66,4 +68,4 @@ Following are the supported events:
   - `close`
   
 
-Documentation: [PieSocket docs](https://piesocket.com/docs)
+Documentation: [PieSocket WebSocket docs](https://piesocket.com/docs)
