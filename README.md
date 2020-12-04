@@ -66,4 +66,4 @@ Following are the supported events:
   - `close`
   
 
-For a full list of supported events and properties, refer to [this guide](https://piesocke.com/websocket)
+Documentation: [PieSocket docs](https://piesocket.com/docs)
