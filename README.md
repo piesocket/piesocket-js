@@ -3,17 +3,21 @@
 ## Installation
 
 Yarn
-`yarn add piesocket-js`
+```
+yarn add piesocket-js
+```
 
 NPM
-`npm i piesocket-js`
+```
+npm i piesocket-js
+```
 
 CDN
 ```html
 <script src="https://unpkg.com/piesocket-js"></script>
 ```
 
-## Initialization
+## Importing
 
 Import module:
 
