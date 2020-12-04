@@ -30,10 +30,12 @@ export default class Channel {
     onMessage(e) {
         this.logger.log('Channel message:', e);
 
-        var message = JSON.parse(e.data);
-        if (message.error.length) {
-            this.shouldReconnect = false;
-        }
+        try {
+            var message = JSON.parse(e.data);
+            if (message.error.length) {
+                this.shouldReconnect = false;
+            }
+        } catch (jsonException) {}
 
         //User defined callback
         if (this.events['message']) {
