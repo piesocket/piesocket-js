@@ -37,7 +37,7 @@ Use the `PieSocket` global variable
 
 ## Usage 
 
-Initialize the PieSocket class:
+1. Initialize the PieSocket class:
 ```javascript
 var piesocket = new PieSocket({
     clusterId: 'YOUR_CLUSTER_ID',
@@ -48,13 +48,13 @@ var piesocket = new PieSocket({
 Reference: [Complete list of configuration options](https://github.com/piesocket/piesocket-js#configuration)
 
 
-Subscribe to a channel:
+2. Subscribe to a channel:
 ```javascript
 var channel = piesocket.subscribe(channelId); //channelId = any integere b/w 1-100000
 ```
 
 
-Listen to message event:
+3. Listen to message event:
 ```javascript
 channel.on('message', function(msg){
     console.log(msg);
