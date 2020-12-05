@@ -2,9 +2,10 @@ import Channel from './Channel';
 import Logger from './Logger';
 const defaultOptions = {
     version: 3,
-    cluster_id: 'demo',
-    api_key: 'oCdCMcMPQpbvNjUIzqtvF1d2X2okWpDQj4AwARJuAgtjhzKxVEjQU6IdCjwm',
-    consoleLogs: false
+    clusterId: 'demo',
+    apiKey: 'oCdCMcMPQpbvNjUIzqtvF1d2X2okWpDQj4AwARJuAgtjhzKxVEjQU6IdCjwm',
+    consoleLogs: false,
+    notifySelf: true
 }
 
 export default class PieSocket {
@@ -35,6 +36,6 @@ export default class PieSocket {
     }
 
     getEndpoint(channelId) {
-        return `wss://${this.options.cluster_id}.websocket.me/v${this.options.version}/${channelId}?api_key=${this.options.api_key}`
+        return `wss://${this.options.clusterId}.websocket.me/v${this.options.version}/${channelId}?api_key=${this.options.apiKey}&notify_self=${this.options.notifySelf}&source=jssdk`
     }
 }

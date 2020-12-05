@@ -40,12 +40,12 @@ Use the `PieSocket` global variable
 Initialize the PieSocket class:
 ```javascript
 var piesocket = new PieSocket({
-    cluster_id: 'YOUR_CLUSTER_ID',
-    api_key: 'YOUR_API_KEY',
-    consoleLogs: false  
+    clusterId: 'YOUR_CLUSTER_ID',
+    apiKey: 'YOUR_API_KEY'
 });
 ```
 
+Reference: [Complete list of configuration options](https://github.com/piesocket/piesocket-js#configuration)
 
 
 Subscribe to a channel:
@@ -66,6 +66,18 @@ Following are the supported events:
   - `message`
   - `error`
   - `close`
+
+
+## Configuration
+Following is the complete list of allowed configuration options
+
+| Option                | Description                                     | Default  |
+| ----------------------------- | ----------------------------------------------------------------------------- | -------------- |
+| apiKey             | Your PieSocket API key                |  Demo key |
+| clusterId          | Your API key's cluster ID                       |  `demo` |
+| consoleLogs        | Logs useful connection info if set to `true`                       |  `false` |
+| notifySelf        | Receive messages sent by self                        |  `true` |
+
   
 
 Documentation: [PieSocket WebSocket docs](https://piesocket.com/docs)
