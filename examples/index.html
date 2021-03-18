@@ -21,7 +21,8 @@
                 <legend class="uk-legend">PieSocket Javascript Client Demo</legend>
 
                 <div class="uk-margin">
-                    <input id="channel-id-input" class="uk-input" type="number" min="1" max="100000" placeholder="Enter channel ID (1-100000)">
+                    <input id="channel-id-input" class="uk-input" type="text" placeholder="Enter channel ID">
+                    <a class="uk-margin-small-left" href="https://www.piesocket.com/docs/3.0/overview" target="_blank">What is a channel ID?</a>
                 </div>
                 <div class="uk-margin">
                     <button id="subscribe-btn" class="uk-button uk-button-primary">Subscribe</button>
@@ -56,8 +57,8 @@
 
         //Initiate PieSocket
         var piesocket = new PieSocket({
-            cluster_id: 'demo',
-            api_key: 'oCdCMcMPQpbvNjUIzqtvF1d2X2okWpDQj4AwARJuAgtjhzKxVEjQU6IdCjwm',
+            clusterId: 'demo',
+            apiKey: 'oCdCMcMPQpbvNjUIzqtvF1d2X2okWpDQj4AwARJuAgtjhzKxVEjQU6IdCjwm',
             consoleLogs: true
         });
 
@@ -77,9 +78,17 @@
             //Register event callbacks
             channel.on('open', function() {
                 logArea.append(`- Subscribed successfully to the channel: ${channelId} \n`);
-                logArea.innerHTML = logArea.innerHTML + `- You can now see messages sent to this channel from <a target="_blank" href="https://www.piesocket.com/websocket-tester">https://www.piesocket.com/websocket-tester</a> or your server.\n`; }); channel.on('message',
-                    function(e) { logArea.append(`- New message on channel ${this.identity.channelId} : ${e.data} \n`); }); channel.on('close', function(e) { logArea.append(`- Channel ${this.identity.channelId} closed \n`); }); })
-                    </script>
-</body>
+                logArea.innerHTML = logArea.innerHTML + `- You can now see messages sent to this channel from <a target="_blank" href="https://www.piesocket.com/websocket-tester">https://www.piesocket.com/websocket-tester</a> or your server.\n`; 
+            });
+            
+            channel.on('message',function(e) { 
+                logArea.append(`- New message on channel ${this.identity.channelId} : ${e.data} \n`); 
+            }); 
 
+            channel.on('close', function(e) {
+                 logArea.append(`- Channel ${this.identity.channelId} closed \n`); 
+            }); 
+        })
+</script>
+</body>
 </html>

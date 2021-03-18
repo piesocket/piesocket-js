@@ -7,7 +7,7 @@ export default class Channel {
         this.identity = identity;
         this.connection = this.connect();
         this.events = {};
-        this.shouldReconnect = true;
+        this.shouldReconnect = false;
         this.logger = new Logger(identity);
     }
 
@@ -45,6 +45,7 @@ export default class Channel {
 
     onOpen(e) {
         this.logger.log('Channel connected:', e);
+        this.shouldReconnect = true;
 
         //User defined callback
         if (this.events['open']) {

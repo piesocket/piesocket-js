@@ -68,6 +68,11 @@ Following are the supported events:
   - `close`
 
 
+Listen any event:
+```javascript
+channel.on(event, callbackFunction);
+```
+
 ## Configuration
 Following is the complete list of allowed configuration options
 
