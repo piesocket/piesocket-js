@@ -1,4 +1,12 @@
-# PieSocket Javascript Client
+# PieSocket JavaScript Client
+
+## Setting up demo 
+- Clone the repo `git clone git@github.com:piesocket/piesocket-js.git`
+- Run `npm install`
+- Run `npm start`
+- Open `http://localhost:8080/examples/`
+
+Now you can interactively test the SDK and find sample codes.
 
 ## Installation
 
@@ -50,7 +58,7 @@ Reference: [Complete list of configuration options](https://github.com/piesocket
 
 2. Subscribe to a channel:
 ```javascript
-var channel = piesocket.subscribe(channelId); //channelId = any integere b/w 1-100000
+var channel = piesocket.subscribe(channelId); 
 ```
 
 
@@ -68,13 +76,25 @@ Following are the supported events:
   - `close`
 
 
-Listen any event:
+Listen to any event:
 ```javascript
 channel.on(event, callbackFunction);
 ```
 
+## Supported Methods
+List of available methods on the PieSocket object
+
+| Method                | Description                                     | Returns  |
+| ----------------------------- | ----------------------------------------------------------------------------- | -------------- |
+| subscribe(channelId)    | Subscribe to a channel                       |  Channel Object |
+| unsubscribe(channelId)  | Un-subscribe from a channel                  |  Boolean |
+| getConnections()        | Get list of all active connections/channels for this client | Object |
+
+
+
+
 ## Configuration
-Following is the complete list of allowed configuration options
+Complete list of allowed configuration options
 
 | Option                | Description                                     | Default  |
 | ----------------------------- | ----------------------------------------------------------------------------- | -------------- |

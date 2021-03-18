@@ -28,6 +28,13 @@
                     <button id="subscribe-btn" class="uk-button uk-button-primary">Subscribe</button>
                 </div>
 
+                <div class="uk-margin">
+                    <label class="uk-margin-small-bottom">Connections</label>
+                    <div id="connection-list">
+                        <pre>No active connctions.</pre>
+                    </div>
+                </div>
+
 
                 <div class="uk-margin">
                     <label class="uk-margin-small-bottom">Logs</label>
@@ -72,15 +79,19 @@
 
             logArea.append(`- Subscribing to channel: ${channelId} \n`);
 
+
             //Subscribe to a channel
             var channel = piesocket.subscribe(channelId);
+
+            //Update connections list
+            updateConnectionList();
 
             //Register event callbacks
             channel.on('open', function() {
                 logArea.append(`- Subscribed successfully to the channel: ${channelId} \n`);
                 logArea.innerHTML = logArea.innerHTML + `- You can now see messages sent to this channel from <a target="_blank" href="https://www.piesocket.com/websocket-tester">https://www.piesocket.com/websocket-tester</a> or your server.\n`; 
             });
-            
+
             channel.on('message',function(e) { 
                 logArea.append(`- New message on channel ${this.identity.channelId} : ${e.data} \n`); 
             }); 
@@ -88,7 +99,32 @@
             channel.on('close', function(e) {
                  logArea.append(`- Channel ${this.identity.channelId} closed \n`); 
             }); 
-        })
+        });
+
+        function unsubscribe(channelId){    
+            piesocket.unsubscribe(channelId);
+         
+            updateConnectionList();
+        }
+
+        function updateConnectionList(){
+            var connections = piesocket.getConnections();
+            var channelIds = Object.keys(connections);
+            var listHolder = document.getElementById('connection-list');
+
+            if(channelIds.length < 1){
+                listHolder.innerHTML = '<pre>No active connctions.</pre>';
+                return;
+            }
+
+            var listHtml = '<ul>';
+            for(var i = 0; i < channelIds.length; i++){
+                listHtml += `<li>${channelIds[i]} - <button type="button" onclick="unsubscribe('${channelIds[i]}')">Unsubscribe</button></li>`;
+            }            
+            listHtml += '</ul>';
+
+            listHolder.innerHTML = listHtml;
+        }
 </script>
 </body>
 </html>
