@@ -1,4 +1,4 @@
-# PieSocket Javascript Client
+# PieSocket JavaScript Client
 
 ## Setting up demo 
 - Clone the repo `git clone git@github.com:piesocket/piesocket-js.git`
