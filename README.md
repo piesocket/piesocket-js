@@ -1,5 +1,13 @@
 # PieSocket Javascript Client
 
+## Setting up demo 
+- Clone the repo `git clone git@github.com:piesocket/piesocket-js.git`
+- Run `npm install`
+- Run `npm start`
+- Open `http://localhost:8080/examples/`
+
+Now you can interactively test the SDK and find sample codes.
+
 ## Installation
 
 Yarn
