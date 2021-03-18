@@ -37,6 +37,21 @@ export default class PieSocket {
         return channel;
     }
 
+    unsubscribe(channelId){
+        if(this.connections[channelId]){
+            this.connections[channelId].shouldReconnect = false;
+            this.connections[channelId].connection.close();
+            delete this.connections[channelId];
+            return true;
+        }
+
+        return false;
+    }
+
+    getConnections(){
+        return this.connections;
+    }
+
     getEndpoint(channelId) {
         return `wss://${this.options.clusterId}.websocket.me/v${this.options.version}/${channelId}?api_key=${this.options.apiKey}&notify_self=${this.options.notifySelf}&source=jssdk&v=${pjson.version}`
     }

@@ -50,7 +50,7 @@ Reference: [Complete list of configuration options](https://github.com/piesocket
 
 2. Subscribe to a channel:
 ```javascript
-var channel = piesocket.subscribe(channelId); //channelId = any integere b/w 1-100000
+var channel = piesocket.subscribe(channelId); 
 ```
 
 
@@ -68,10 +68,31 @@ Following are the supported events:
   - `close`
 
 
-Listen any event:
+Listen to any event:
 ```javascript
 channel.on(event, callbackFunction);
 ```
+
+## Supported Methods
+
+```javascript
+subscribe(channelId)
+```
+Subscribe to a channel, returns a Channel instance.
+
+
+```javascript
+unsubscribe(channelId)
+```
+Un-subscribe to a channel, returns boolean.
+
+
+```javascript
+getConnections()
+```
+Returns list of all active connections/channels for this client.
+
+
 
 ## Configuration
 Following is the complete list of allowed configuration options
