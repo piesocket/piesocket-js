@@ -82,28 +82,19 @@ channel.on(event, callbackFunction);
 ```
 
 ## Supported Methods
+List of allowed methods on the PieSocket object
 
-```javascript
-subscribe(channelId)
-```
-Subscribe to a channel, returns a Channel instance.
+| Method                | Description                                     | Returns  |
+| ----------------------------- | ----------------------------------------------------------------------------- | -------------- |
+| subscribe(channelId)    | Subscribe to a channel                       |  Channel Object |
+| unsubscribe(channelId)  | Un-subscribe from a channel                  |  Boolean |
+| getConnections()        | Get list of all active connections/channels for this client | Object |
 
-
-```javascript
-unsubscribe(channelId)
-```
-Un-subscribe to a channel, returns boolean.
-
-
-```javascript
-getConnections()
-```
-Returns list of all active connections/channels for this client.
 
 
 
 ## Configuration
-Following is the complete list of allowed configuration options
+Complete list of allowed configuration options
 
 | Option                | Description                                     | Default  |
 | ----------------------------- | ----------------------------------------------------------------------------- | -------------- |
