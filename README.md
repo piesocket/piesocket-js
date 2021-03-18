@@ -82,7 +82,7 @@ channel.on(event, callbackFunction);
 ```
 
 ## Supported Methods
-List of allowed methods on the PieSocket object
+List of available methods on the PieSocket object
 
 | Method                | Description                                     | Returns  |
 | ----------------------------- | ----------------------------------------------------------------------------- | -------------- |
