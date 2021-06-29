@@ -1,6 +1,6 @@
-import Channel from './Channel';
-import Logger from './Logger';
-var pjson = require('../package.json');
+import Channel from './Channel.js';
+import Logger from './Logger.js';
+import pjson from '../package.json';
 
 const defaultOptions = {
     version: 3,
@@ -53,6 +53,6 @@ export default class PieSocket {
     }
 
     getEndpoint(channelId) {
-        return `wss://${this.options.clusterId}.websocket.me/v${this.options.version}/${channelId}?api_key=${this.options.apiKey}&notify_self=${this.options.notifySelf}&source=jssdk&v=${pjson.version}`
+        return `wss://${this.options.clusterId}.piesocket.com/v${this.options.version}/${channelId}?api_key=${this.options.apiKey}&notify_self=${this.options.notifySelf}&source=jssdk&v=${pjson.version}`
     }
 }
