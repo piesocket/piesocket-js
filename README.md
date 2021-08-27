@@ -1,5 +1,10 @@
 # PieSocket JavaScript Client
 
+A JavaScript Library for PieSocket Channels.
+
+[PieSocket Channels](https://www.piesocket.com/blog/channels/) are a medium for clients and a server to communicate in real-time. Unlike, other platforms such as Pusher, we also provide the client-to-client communication ability with PieSocket Channels.
+
+
 ## Setting up demo 
 - Clone the repo `git clone git@github.com:piesocket/piesocket-js.git`
 - Run `npm install`
