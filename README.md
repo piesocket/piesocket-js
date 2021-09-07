@@ -4,14 +4,6 @@ A JavaScript Library for PieSocket Channels.
 
 [PieSocket Channels](https://www.piesocket.com/blog/channels/) are a medium for clients and servers to communicate in real-time. Unlike, other platforms such as Pusher, we also provide the client-to-client communication ability with PieSocket Channels.
 
-## Setting up demo 
-- Clone the repo `git clone git@github.com:piesocket/piesocket-js.git`
-- Run `npm install`
-- Run `npm start`
-- Open `http://localhost:8080/examples/`
-
-Now you can interactively test the SDK and find sample codes.
-
 ## Installation
 
 Yarn
@@ -94,6 +86,7 @@ Content-Length: 188
 }
 ```
 
+
 ## Client to client communication
 You can enable `C2C` communication for your API key from your PieSocket account and then use the `send` method of the Channel object to send messages directly from a client.
 ```javascript
@@ -127,5 +120,13 @@ Complete list of allowed configuration options
 | notifySelf        | Receive messages sent by self                        |  `true` |
 
   
+## Development
+- Clone the repo `git clone git@github.com:piesocket/piesocket-js.git`
+- Run `npm install`
+- Run `npm start`
+- Open `http://localhost:8080/examples/`
+
+Now you can interactively test the SDK and find sample codes.
+
 
 Documentation: [PieSocket WebSocket docs](https://piesocket.com/docs)
