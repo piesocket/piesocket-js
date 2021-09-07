@@ -78,7 +78,6 @@ Use the following POST request to publish a message from your server.
 POST /api/publish HTTP/1.1
 Host: CLUSTER_ID.piesocket.com
 Content-Type: application/json
-Content-Length: 188
 
 {
     "key": "API_KEY",
