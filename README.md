@@ -2,7 +2,7 @@
 
 A JavaScript Library for PieSocket Channels.
 
-[PieSocket Channels](https://www.piesocket.com/blog/channels/) are a medium for clients and servers to communicate in real-time. Client-to-client communication is also supported.
+[PieSocket Channels](https://www.piesocket.com/blog/channels/) are a medium for clients and servers to communicate in real-time. Client-to-client communications are also supported.
 
 ## Installation
 
