@@ -50,6 +50,7 @@ Reference: [Complete list of configuration options](https://github.com/piesocket
 2. Subscribe to a channel:
 ```javascript
 var channel = piesocket.subscribe(channelId); 
+
 channel.on("open", ()=>{
   console.log("PieSocket Channel Connected!");
 });
@@ -58,10 +59,11 @@ channel.on("open", ()=>{
 
 3. Listen to message event:
 ```javascript
-channel.on('message', function(msg){
-    console.log(msg);
+channel.on('message', function(event){
+    console.log(event.data);
 });
 ```
+Use `JSON.parse` on `event.data` if it is json.
 
 Following are other supported events:
   - `open`
@@ -90,11 +92,16 @@ Content-Length: 188
 ## Client to client communication
 You can enable `C2C` communication for your API key from your PieSocket account and then use the `send` method of the Channel object to send messages directly from a client.
 ```javascript
-channel.send(payload);
+channel.send(stringText);
 ```
 
-`payload` can be a string or json.
+To send JSON, use following code:
+```javascript
+channel.send(JSON.stringify(payload));
+```
 
+
+Make sure you are calling `send` method after connection has been made i.e `on('open', callback)` has been called.
 
 
 ## Supported Methods
