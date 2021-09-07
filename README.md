@@ -87,7 +87,7 @@ Content-Length: 188
     "message": "Hello world!"
 }
 ```
-
+See code examples for this request in PHP, NodeJS, Ruby, Python, Java and Go in our [official documentation](https://www.piesocket.com/docs/3.0/overview).
 
 ## Client to client communication
 You can enable `C2C` communication for your API key from your PieSocket account and then use the `send` method of the Channel object to send messages directly from a client.
