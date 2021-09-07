@@ -4,7 +4,6 @@ A JavaScript Library for PieSocket Channels.
 
 [PieSocket Channels](https://www.piesocket.com/blog/channels/) are a medium for clients and servers to communicate in real-time. Unlike, other platforms such as Pusher, we also provide the client-to-client communication ability with PieSocket Channels.
 
-
 ## Setting up demo 
 - Clone the repo `git clone git@github.com:piesocket/piesocket-js.git`
 - Run `npm install`
@@ -27,7 +26,7 @@ npm i piesocket-js
 
 CDN
 ```html
-<script src="https://unpkg.com/piesocket-js"></script>
+<script src="https://unpkg.com/piesocket-js@1"></script>
 ```
 
 ## Importing
@@ -43,7 +42,7 @@ With CDN/Browser:
 
 Use the `PieSocket` global variable
 
-## Usage 
+## Subscribe on frontend 
 
 1. Initialize the PieSocket class:
 ```javascript
@@ -72,17 +71,38 @@ channel.on('message', function(msg){
 });
 ```
 
-Following are the supported events:
+Following are other supported events:
   - `open`
   - `message`
   - `error`
   - `close`
 
+## Publish from server
+Use the following POST request to publish a message from your server.
 
-Listen to any event:
-```javascript
-channel.on(event, callbackFunction);
 ```
+POST /api/publish HTTP/1.1
+Host: CLUSTER_ID.piesocket.com
+Content-Type: application/json
+Content-Length: 188
+
+{
+    "key": "API_KEY",
+    "secret": "API_SECRET",
+    "channelId": "CHANNEL_ID",
+    "message": "Hello world!"
+}
+```
+
+## Client to client communication
+You can enable `C2C` communication for your API key from your PieSocket account and then use the `send` method of the Channel object to send messages directly from a client.
+```javascript
+channel.send(payload);
+```
+
+`payload` can be a string or json.
+
+
 
 ## Supported Methods
 List of available methods on the PieSocket object

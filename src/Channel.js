@@ -26,6 +26,9 @@ export default class Channel {
         this.events[event] = callback;
     }
 
+    send(data){
+        return this.connection.send(data);
+    }
 
     onMessage(e) {
         this.logger.log('Channel message:', e);
