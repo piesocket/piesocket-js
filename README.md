@@ -2,7 +2,7 @@
 
 A JavaScript Library for PieSocket Channels.
 
-[PieSocket Channels](https://www.piesocket.com/blog/channels/) are a medium for clients and a server to communicate in real-time. Unlike, other platforms such as Pusher, we also provide the client-to-client communication ability with PieSocket Channels.
+[PieSocket Channels](https://www.piesocket.com/blog/channels/) are a medium for clients and servers to communicate in real-time. Unlike, other platforms such as Pusher, we also provide the client-to-client communication ability with PieSocket Channels.
 
 
 ## Setting up demo 
@@ -35,11 +35,6 @@ CDN
 Import module:
 
 ```javascript
-const PieSocket = require('piesocket-js');
-```
-
-With ES6:
-```javascript
 import PieSocket from 'piesocket-js';
 ```
 
@@ -64,6 +59,9 @@ Reference: [Complete list of configuration options](https://github.com/piesocket
 2. Subscribe to a channel:
 ```javascript
 var channel = piesocket.subscribe(channelId); 
+channel.on("open", ()=>{
+  console.log("PieSocket Channel Connected!");
+});
 ```
 
 
