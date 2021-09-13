@@ -4,6 +4,7 @@ A JavaScript Library for PieSocket Channels.
 
 [PieSocket Channels](https://www.piesocket.com/blog/channels/) are a medium for clients and servers to communicate in real-time. Client-to-client communications are also supported.
 
+Note: This package is for client-side subscribing, if you are looking for the package to use on the server-side for publishing, please see [PieSocket-NodeJS](https://github.com/piesocket/piesocket-nodejs).
 ## Installation
 
 Yarn
