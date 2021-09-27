@@ -7,7 +7,8 @@ const defaultOptions = {
     clusterId: 'demo',
     apiKey: 'oCdCMcMPQpbvNjUIzqtvF1d2X2okWpDQj4AwARJuAgtjhzKxVEjQU6IdCjwm',
     consoleLogs: false,
-    notifySelf: true
+    notifySelf: true,
+    jwt: null,
 }
 
 export default class PieSocket {
@@ -53,6 +54,10 @@ export default class PieSocket {
     }
 
     getEndpoint(channelId) {
-        return `wss://${this.options.clusterId}.piesocket.com/v${this.options.version}/${channelId}?api_key=${this.options.apiKey}&notify_self=${this.options.notifySelf}&source=jssdk&v=${pjson.version}`
+        let endpoint = `wss://${this.options.clusterId}.piesocket.com/v${this.options.version}/${channelId}?api_key=${this.options.apiKey}&notify_self=${this.options.notifySelf}&source=jssdk&v=${pjson.version}`
+        if(this.options.jwt){
+            endpoint = endpoint+"&jwt="+this.options.jwt;
+        }
+        return endpoint;
     }
 }

@@ -125,6 +125,7 @@ Complete list of allowed configuration options
 | clusterId          | Your API key's cluster ID                       |  `demo` |
 | consoleLogs        | Logs useful connection info if set to `true`                       |  `false` |
 | notifySelf        | Receive messages sent by self                        |  `true` |
+| jwt        | JWT authentication token                        |  `null` |
 
   
 ## Development
