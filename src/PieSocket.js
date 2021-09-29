@@ -7,7 +7,7 @@ const defaultOptions = {
     clusterId: 'demo',
     apiKey: 'oCdCMcMPQpbvNjUIzqtvF1d2X2okWpDQj4AwARJuAgtjhzKxVEjQU6IdCjwm',
     consoleLogs: false,
-    notifySelf: true,
+    notifySelf: 0,
     jwt: null,
     presence: 0,
 }
