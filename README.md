@@ -121,8 +121,8 @@ Complete list of allowed configuration options
 
 | Option                | Description                                     | Default  |
 | ----------------------------- | ----------------------------------------------------------------------------- | -------------- |
-| apiKey             | Your PieSocket API key                |  Demo key |
-| clusterId          | Your API key's cluster ID                       |  `demo` |
+| apiKey             | Required, Your PieSocket API key                |  Demo key |
+| clusterId          | Required, Your API key's cluster ID                       |  `demo` |
 | consoleLogs        | Logs useful connection info if set to `true`                       |  `false` |
 | notifySelf        | Receive messages sent by self, pass `0` to disabled                        |  `1` |
 | jwt        | JWT authentication token                        |  `null` |
