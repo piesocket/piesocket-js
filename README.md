@@ -126,6 +126,7 @@ Complete list of allowed configuration options
 | consoleLogs        | Logs useful connection info if set to `true`                       |  `false` |
 | notifySelf        | Receive messages sent by self                        |  `true` |
 | jwt        | JWT authentication token                        |  `null` |
+| presence        | Enable presence events, pass 1 to enabled                     |  `0` |
 
   
 ## Development

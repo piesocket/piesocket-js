@@ -9,6 +9,7 @@ const defaultOptions = {
     consoleLogs: false,
     notifySelf: true,
     jwt: null,
+    presence: 0,
 }
 
 export default class PieSocket {
@@ -54,7 +55,7 @@ export default class PieSocket {
     }
 
     getEndpoint(channelId) {
-        let endpoint = `wss://${this.options.clusterId}.piesocket.com/v${this.options.version}/${channelId}?api_key=${this.options.apiKey}&notify_self=${this.options.notifySelf}&source=jssdk&v=${pjson.version}`
+        let endpoint = `wss://${this.options.clusterId}.piesocket.com/v${this.options.version}/${channelId}?api_key=${this.options.apiKey}&notify_self=${this.options.notifySelf}&source=jssdk&v=${pjson.version}&presence=${this.options.presence}`
         if(this.options.jwt){
             endpoint = endpoint+"&jwt="+this.options.jwt;
         }
