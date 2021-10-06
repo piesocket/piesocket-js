@@ -85,7 +85,7 @@ export default class PieSocket {
                 reject(new InvalidAuthException("Could not fetch auth token", "AuthEndpointError"));
             });
 
-            xhr.open("GET", this.options.authEndpoint);
+            xhr.open("POST", this.options.authEndpoint);
 
             const headers = Object.keys(this.options.authHeaders);
             headers.forEach(header => {
