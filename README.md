@@ -125,8 +125,11 @@ Complete list of allowed configuration options
 | clusterId          | Required, Your API key's cluster ID                       |  `demo` |
 | consoleLogs        | Logs useful connection info if set to `true`                       |  `false` |
 | notifySelf        | Receive messages sent by self, pass `0` to disabled                        |  `1` |
-| jwt        | JWT authentication token                        |  `null` |
+| jwt        | JWT authentication token, skips authentication endpoint call                        |  `null` |
 | presence        | Enable presence events, pass `1` to enabled                     |  `0` |
+| authEndpoint        | Authentication endpoint for private channels                     |  `/broadcasting/auth` |
+| authHeaders        | Headers to include with authEndpoint call                   |  `{}` |
+| forceAuth        | Force authentication on all channels                    |  `false` |
 
   
 ## Development

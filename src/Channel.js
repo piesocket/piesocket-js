@@ -2,11 +2,20 @@ import Logger from './Logger.js';
 
 export default class Channel {
 
-    constructor(endpoint, identity) {
+    constructor(endpoint, identity, init=true) {
+        this.events = {};
+
+        if(!init){
+            return;
+        }
+
+        this.init(endpoint, identity);
+    }
+
+    init(endpoint, identity){        
         this.endpoint = endpoint;
         this.identity = identity;
         this.connection = this.connect();
-        this.events = {};
         this.shouldReconnect = false;
         this.logger = new Logger(identity);
     }
@@ -35,10 +44,12 @@ export default class Channel {
 
         try {
             var message = JSON.parse(e.data);
-            if (message.error.length) {
+            if (message.error && message.error.length) {
                 this.shouldReconnect = false;
             }
-        } catch (jsonException) {}
+        } catch (jsonException) {
+            console.error(jsonException);
+        }
 
         //User defined callback
         if (this.events['message']) {
