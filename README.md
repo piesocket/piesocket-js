@@ -130,6 +130,7 @@ Complete list of allowed configuration options
 | authEndpoint        | Authentication endpoint for private channels                     |  `/broadcasting/auth` |
 | authHeaders        | Headers to include with authEndpoint call                   |  `{}` |
 | forceAuth        | Force authentication on all channels                    |  `false` |
+| userId        | User ID, used in presence channels                    |  `anonymous` |
 
   
 ## Development

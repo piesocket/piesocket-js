@@ -13,7 +13,8 @@ const defaultOptions = {
     presence: 0,
     authEndpoint: "/broadcasting/auth",
     authHeaders: {},
-    forceAuth: false    
+    forceAuth: false, 
+    userId: null
 }
 
 export default class PieSocket {
@@ -75,7 +76,7 @@ export default class PieSocket {
                 if(this.readyState === 4) {
                     try{
                         const response =  JSON.parse(this.responseText);
-                        resolve(response.auth);
+                        resolve(response);
                     }catch(e){
                         reject(new InvalidAuthException("Could not fetch auth token", "AuthEndpointResponseError"));
                     }
@@ -105,15 +106,39 @@ export default class PieSocket {
     }
 
     async getEndpoint(channelId) {
+        let user_id = this.options.userId;
+
         let endpoint = `wss://${this.options.clusterId}.piesocket.com/v${this.options.version}/${channelId}?api_key=${this.options.apiKey}&notify_self=${this.options.notifySelf}&source=jssdk&v=${pjson.version}&presence=${this.options.presence}`
 
         if(this.options.jwt){
             endpoint = endpoint+"&jwt="+this.options.jwt;
         }
         else if(this.isGuarded(channelId)){
-            const authToken = await this.getAuthToken(channelId);
-            endpoint = endpoint + "&jwt="+authToken;
+            const auth = await this.getAuthToken(channelId);
+
+            //Set user id
+            if(auth.channel_data){
+
+                if(typeof auth.channel_data == "string"){
+                    try{
+                        const channelData = JSON.parse(auth.channel_data);   
+                        if(channelData.user_id){
+                            user_id = channelData.user_id;                 
+                        }     
+                    }catch(e){}
+                }
+                else if(typeof auth.channel_data == 'object' && auth.channel_data.user_id){
+                    user_id = auth.channel_data.user_id;             
+                }
+            }
+
+            endpoint = endpoint + "&jwt="+auth.auth;
         }
+
+        if(user_id){
+            endpoint = endpoint + "&user="+user_id;
+        }
+
         return endpoint;
     }
 }
