@@ -106,37 +106,22 @@ export default class PieSocket {
     }
 
     async getEndpoint(channelId) {
-        let user_id = this.options.userId;
-
         let endpoint = `wss://${this.options.clusterId}.piesocket.com/v${this.options.version}/${channelId}?api_key=${this.options.apiKey}&notify_self=${this.options.notifySelf}&source=jssdk&v=${pjson.version}&presence=${this.options.presence}`
 
+        //Set auth
         if(this.options.jwt){
             endpoint = endpoint+"&jwt="+this.options.jwt;
         }
         else if(this.isGuarded(channelId)){
             const auth = await this.getAuthToken(channelId);
-
-            //Set user id
-            if(auth.channel_data){
-
-                if(typeof auth.channel_data == "string"){
-                    try{
-                        const channelData = JSON.parse(auth.channel_data);   
-                        if(channelData.user_id){
-                            user_id = channelData.user_id;                 
-                        }     
-                    }catch(e){}
-                }
-                else if(typeof auth.channel_data == 'object' && auth.channel_data.user_id){
-                    user_id = auth.channel_data.user_id;             
-                }
+            if(auth.auth){
+                endpoint = endpoint + "&jwt="+auth.auth;
             }
-
-            endpoint = endpoint + "&jwt="+auth.auth;
         }
 
-        if(user_id){
-            endpoint = endpoint + "&user="+user_id;
+        //Set user identity
+        if(this.options.userId){
+            endpoint = endpoint + "&user="+this.options.userId;
         }
 
         return endpoint;
