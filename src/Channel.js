@@ -21,7 +21,6 @@ export default class Channel {
         this.shouldReconnect = false;
         this.logger = new Logger(identity);
 
-        this.blockchain = new Blockchain(identity.apiKey, identity.channelId);
     }
 
     connect() {
@@ -44,6 +43,9 @@ export default class Channel {
     }
 
     sendOnBlockchain(data) {
+        if (!this.blockchain) {
+            this.blockchain = new Blockchain(this.identity.apiKey, this.identity.channelId);
+        }
         this.blockchain.send(data)
             .then((hash) => {
                 return this.connection.send(JSON.stringify({ "message": data, "transaction_id": hash }));
@@ -56,6 +58,10 @@ export default class Channel {
     }
 
     confirmOnBlockchain(transactionHash) {
+        if (!this.blockchain) {
+            this.blockchain = new Blockchain(identity.apiKey, identity.channelId);
+        }
+
         this.blockchain.confirm(transactionHash)
             .then((hash) => {
                 return this.connection.send(JSON.stringify({ "event": "confirm-transaction", "transaction_id": hash }));

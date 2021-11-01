@@ -104,7 +104,7 @@ Content-Type: application/json
 See code examples for this request in PHP, NodeJS, Ruby, Python, Java and Go in our [official documentation](https://www.piesocket.com/docs/3.0/overview).
 
 ## Blockchain Realtime
-Send 100% trustworthy messages to connected peers and mantain a proof of the message on the Ethereum Blockchain network. 
+Send 100% trustworthy messages to connected peers and maintain a proof of the message on the Ethereum Blockchain network. 
 
 To send a message on the Blockhain
 ```javascript
@@ -113,24 +113,16 @@ channel.sendOnBlockchain(payload);
 `payload` should be a string. 
 You will have to sign this message using the [MetaMask](https://metamask.io/download) Ethereum Wallet.
 
-Listen for incoming Blockchain messages
+To confirm a message on the receiver's end.
 ```javascript
-channel.on('blockchain', function(event){
-  console.log(event.data);
-});
+channel.confimOnBlockchain(transactionHash);
 ```
+`transactionHash` is the transaction hash received from the blockchain message sender.
 
-To accpet a blockchain message on the receiver's end.
-```javascript
-channel.on('blockchain', function(event){
-  channel.acceptOnBlockchain(event.data);
-});
-```
-
-To get a list blockchain messages pending acceptance, use the [REST API](https://www.piesocket.com/docs/3.0/rest-api).
+To get a list of blockchain messages pending acceptance, use the [REST API](https://www.piesocket.com/docs/3.0/rest-api).
 
 ## Supported Methods
-List of available methods on the PieSocket object
+List of available methods on the `PieSocket` object
 
 | Method                | Description                                     | Returns  |
 | ----------------------------- | ----------------------------------------------------------------------------- | -------------- |
