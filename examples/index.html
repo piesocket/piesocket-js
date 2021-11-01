@@ -8,7 +8,7 @@
 
     <!-- UIkit CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.5.10/dist/css/uikit.min.css" />
-
+    <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js/dist/web3.min.js"></script>
 </head>
 
 <body>
@@ -81,7 +81,7 @@
 
 
             //Subscribe to a channel
-            var channel = piesocket.subscribe(channelId);
+            window.channel = piesocket.subscribe(channelId);
 
             //Update connections list
             updateConnectionList();

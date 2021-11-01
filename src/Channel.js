@@ -1,9 +1,11 @@
 import Logger from './Logger.js';
+import Blockchain from './Blockchain';
 
 export default class Channel {
 
     constructor(endpoint, identity, init=true) {
         this.events = {};
+        this.blockchain = new Blockchain();
 
         if(!init){
             return;
@@ -37,6 +39,11 @@ export default class Channel {
 
     send(data){
         return this.connection.send(data);
+    }
+
+    sendOnBlockchain(data) {
+        this.blockchain.send(data);
+        return this.connection.send({ ...data, is_blockchain: true });
     }
 
     onMessage(e) {
