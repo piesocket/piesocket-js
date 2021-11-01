@@ -72,6 +72,20 @@ Following are other supported events:
   - `error`
   - `close`
 
+## Publish from browser
+
+You can enable `C2C` (Client to client) communication for your API key from your PieSocket account to use the `send` method of the Channel object to send messages directly from a client.
+```javascript
+channel.send(stringText);
+```
+
+To send JSON, use following code:
+```javascript
+channel.send(JSON.stringify(payload));
+```
+
+Make sure you are calling `send` method after connection has been made i.e `on('open', callback)` has been called.
+
 ## Publish from server
 Use the following POST request to publish a message from your server.
 
@@ -89,23 +103,26 @@ Content-Type: application/json
 ```
 See code examples for this request in PHP, NodeJS, Ruby, Python, Java and Go in our [official documentation](https://www.piesocket.com/docs/3.0/overview).
 
-## Client to client communication
-You can enable `C2C` communication for your API key from your PieSocket account and then use the `send` method of the Channel object to send messages directly from a client.
+## Blockchain Realtime
+Send 100% trustworthy messages to connected peers and maintain a proof of the message on the Ethereum Blockchain network. 
+
+To send a message on the Blockhain
 ```javascript
-channel.send(stringText);
+channel.sendOnBlockchain(payload);
 ```
+`payload` should be a string. 
+You will have to sign this message using the [MetaMask](https://metamask.io/download) Ethereum Wallet.
 
-To send JSON, use following code:
+To confirm a message on the receiver's end.
 ```javascript
-channel.send(JSON.stringify(payload));
+channel.confimOnBlockchain(transactionHash);
 ```
+`transactionHash` is the transaction hash received from the blockchain message sender.
 
-
-Make sure you are calling `send` method after connection has been made i.e `on('open', callback)` has been called.
-
+To get a list of blockchain messages pending acceptance, use the [REST API](https://www.piesocket.com/docs/3.0/rest-api).
 
 ## Supported Methods
-List of available methods on the PieSocket object
+List of available methods on the `PieSocket` object
 
 | Method                | Description                                     | Returns  |
 | ----------------------------- | ----------------------------------------------------------------------------- | -------------- |

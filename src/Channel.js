@@ -1,9 +1,11 @@
 import Logger from './Logger.js';
+import Blockchain from './Blockchain';
 
 export default class Channel {
 
     constructor(endpoint, identity, init=true) {
         this.events = {};
+
 
         if(!init){
             return;
@@ -18,6 +20,7 @@ export default class Channel {
         this.connection = this.connect();
         this.shouldReconnect = false;
         this.logger = new Logger(identity);
+
     }
 
     connect() {
@@ -37,6 +40,37 @@ export default class Channel {
 
     send(data){
         return this.connection.send(data);
+    }
+
+    sendOnBlockchain(data) {
+        if (!this.blockchain) {
+            this.blockchain = new Blockchain(this.identity.apiKey, this.identity.channelId);
+        }
+        this.blockchain.send(data)
+            .then((hash) => {
+                return this.connection.send(JSON.stringify({ "message": data, "transaction_id": hash }));
+            })
+            .catch((e) => {
+                if (this.events['blockchain-error']) {
+                    this.events['blockchain-error'].bind(this)(e);
+                }
+            });
+    }
+
+    confirmOnBlockchain(transactionHash) {
+        if (!this.blockchain) {
+            this.blockchain = new Blockchain(identity.apiKey, identity.channelId);
+        }
+
+        this.blockchain.confirm(transactionHash)
+            .then((hash) => {
+                return this.connection.send(JSON.stringify({ "event": "confirm-transaction", "transaction_id": hash }));
+            })
+            .catch((e) => {
+                if (this.events['blockchain-error']) {
+                    this.events['blockchain-error'].bind(this)(e);
+                }
+            });
     }
 
     onMessage(e) {
