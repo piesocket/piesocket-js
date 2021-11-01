@@ -5,7 +5,7 @@ export default class Channel {
 
     constructor(endpoint, identity, init=true) {
         this.events = {};
-        this.blockchain = new Blockchain();
+
 
         if(!init){
             return;
@@ -20,6 +20,8 @@ export default class Channel {
         this.connection = this.connect();
         this.shouldReconnect = false;
         this.logger = new Logger(identity);
+
+        this.blockchain = new Blockchain(identity.apiKey, identity.channelId);
     }
 
     connect() {
@@ -42,8 +44,27 @@ export default class Channel {
     }
 
     sendOnBlockchain(data) {
-        this.blockchain.send(data);
-        return this.connection.send({ ...data, is_blockchain: true });
+        this.blockchain.send(data)
+            .then((hash) => {
+                return this.connection.send(JSON.stringify({ "message": data, "transaction_id": hash }));
+            })
+            .catch((e) => {
+                if (this.events['blockchain-error']) {
+                    this.events['blockchain-error'].bind(this)(e);
+                }
+            });
+    }
+
+    confirmOnBlockchain(transactionHash) {
+        this.blockchain.confirm(transactionHash)
+            .then((hash) => {
+                return this.connection.send(JSON.stringify({ "event": "confirm-transaction", "transaction_id": hash }));
+            })
+            .catch((e) => {
+                if (this.events['blockchain-error']) {
+                    this.events['blockchain-error'].bind(this)(e);
+                }
+            });
     }
 
     onMessage(e) {
