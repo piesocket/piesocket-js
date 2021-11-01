@@ -113,9 +113,9 @@ channel.sendOnBlockchain(payload);
 `payload` should be a string. 
 You will have to sign this message using the [MetaMask](https://metamask.io/download) Ethereum Wallet.
 
-To confirm a message on the receiver's end.
+Optinally, to confirm a message on the receiver's end, to create a proof-of-acceptance on the Blockchain. Use the following method.
 ```javascript
-channel.confimOnBlockchain(transactionHash);
+channel.confirmOnBlockchain(transactionHash);
 ```
 `transactionHash` is the transaction hash received from the blockchain message sender.
 
