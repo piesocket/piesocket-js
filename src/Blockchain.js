@@ -63,7 +63,11 @@ export default class Blockchain {
 				});
 
 			} else {
-				reject()
+				if (typeof Web3 == 'undefined') {
+					reject("Please install Web3.js");
+				} else {
+					reject("Please install MetaMask");
+				}
 			}
 		});
 	}
