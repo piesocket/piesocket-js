@@ -56,14 +56,15 @@ var channel = piesocket.subscribe(channelId);
 
 3. Listen to an event:
 ```javascript
-channel.listen('event-name', function(data){
-    console.log(`event-name published with data: ${data}`);
+channel.listen('event-name', function(data, meta){
+    console.log("event-name received: ", data, meta);
 });
 ```
+
 or, Listen to all events:
 ```javascript
-channel.listen('*', function(event, data){
-    console.log(`${event} published with data: ${data}`);
+channel.listen('*', function(event, data, meta){
+    console.log(`${event} received: `, data, meta);
 });
 ```
 
@@ -75,18 +76,24 @@ channel.on('open', function(event){
 ```
 
 Following life-cycle events are available:
-  - `open`
-  - `message`
-  - `error`
-  - `close`
+  - `open`: Fired when WebSocket connect is established.
+  - `message`: Fired when WebSocket message is received.
+  - `error`: Fired when WebSocket connection error occurs.
+  - `close`: Fired when WebSocket connection is closed.
+  - `blockchain-error`: Fired when Blockchain error occurs.
+  - `blockchain-hash`:  Fired when Blockchain contract's transaction hash is available.
 
 ## Publish Events From Browser
 
 You can publish messages directly from the client. Enable `C2C` (Client to client) communication for the API key from your [PieSocket account](https://www.piesocket.com/dashboard) to do the following.
 
 ```javascript
-channel.publish("event-name", jsonPayload);
+channel.publish("event-name", data, meta);
 ```
+
+Parameters:
+- `data`: JSON data for the event.
+- `meta`: Optional information about the event in JSON format.
 
 Make sure to call the `publish` method after connection has been made i.e `on('open', callback)` has been called.
 
@@ -102,7 +109,7 @@ Content-Type: application/json
   "key": "API_KEY",
   "secret": "API_SECRET",
   "channelId": "CHANNEL_ID",
-  "message": {"event":"new-tweet", "data":"Hello @PieSocketAPI!"}
+  "message": { "event":"new-tweet", "data":"Hello @PieSocketAPI!", "meta":{ "user": 143 } }
 }
 ```
 See code examples for this request in PHP, NodeJS, Ruby, Python, Java, and Go in [PieSocket documentation](https://www.piesocket.com/docs/3.0/overview).
@@ -112,25 +119,25 @@ Send 100% trustworthy messages to connected peers and maintain a proof of the me
 
 To send a message on the Blockhain
 ```javascript
-channel.sendOnBlockchain(jsonPayload);
+channel.publish("event-name", data, {
+  blockchain: true
+});
 ```
 `payload` should be a string. 
 You will have to sign this message using the [MetaMask](https://metamask.io/download) Ethereum Wallet.
 
-To listen to an incoming Blockchain message.
-```javascript
-channel.listen("blockchain-message", function(data){
-  console.log(data);
-});
-```
-
 Optinally, to confirm a message on the receiver's end, to create a proof-of-acceptance on the Blockchain. Use the following method.
 ```javascript
-channel.listen("blockchain-message", function(data){
-  channel.confirmOnBlockchain(data.transaction_id);
+channel.listen("event-name", function(data, meta){
+  if(meta && meta.blockchain && meta.transaction_hash){
+    //This is blockchain message, confirm as witness of event.
+    channel.confirmOnBlockchain("blockchain-confirmation", meta.transaction_hash);
+  }
 })
 ```
-`transaction_id` is the transaction hash received with a blockchain message.
+`meta.transaction_hash` is the transaction hash for the initial blockchain message.
+
+Above code emits an event `blockchain-confirmation` with the confirmation contract's transaction hash in `meta`.
 
 To get a list of blockchain messages pending acceptance, use the [REST API](https://www.piesocket.com/docs/3.0/rest-api).
 

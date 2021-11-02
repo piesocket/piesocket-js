@@ -5,6 +5,7 @@ export default class Channel {
 
     constructor(endpoint, identity, init=true) {
         this.events = {};
+        this.listeners = {};
 
 
         if(!init){
@@ -20,7 +21,6 @@ export default class Channel {
         this.connection = this.connect();
         this.shouldReconnect = false;
         this.logger = new Logger(identity);
-
     }
 
     connect() {
@@ -34,12 +34,13 @@ export default class Channel {
     }
 
     on(event, callback) {
-        //Register user defined callbacks
+        //Register lifecycle callbacks
         this.events[event] = callback;
     }
 
     listen(event, callback) {
-        this.events[event] = callback;
+        //Register user defined callbacks
+        this.listeners[event] = callback;
     }
 
 
@@ -47,21 +48,33 @@ export default class Channel {
         return this.connection.send(data);
     }
 
-    publish(event, data) {
+    publish(event, data, meta) {
+        if (meta && meta.blockchain) {
+            return this.sendOnBlockchain(event, data, meta);
+        }
         return this.connection.send(JSON.stringify({
             event: event,
-            data: data
+            data: data,
+            meta: meta
         }));
     }
 
 
-    sendOnBlockchain(data) {
+    sendOnBlockchain(event, data, meta) {
         if (!this.blockchain) {
             this.blockchain = new Blockchain(this.identity.apiKey, this.identity.channelId);
         }
         this.blockchain.send(data)
             .then((hash) => {
-                return this.connection.send(JSON.stringify({ "event": "blockchain-message", "data": { "message": data, "transaction_id": hash } }));
+                if (this.events['blockchain-hash']) {
+                    this.events['blockchain-hash'].bind(this)({
+                        event: event,
+                        data: data,
+                        meta: meta,
+                        transactionHash: hash
+                    });
+                }
+                return this.connection.send(JSON.stringify({ "event": event, "data": data, "meta": { ...meta, "transaction_hash": hash } }));
             })
             .catch((e) => {
                 if (this.events['blockchain-error']) {
@@ -70,14 +83,21 @@ export default class Channel {
             });
     }
 
-    confirmOnBlockchain(transactionHash) {
+    confirmOnBlockchain(event, transactionHash) {
         if (!this.blockchain) {
             this.blockchain = new Blockchain(identity.apiKey, identity.channelId);
         }
 
         this.blockchain.confirm(transactionHash)
             .then((hash) => {
-                return this.connection.send(JSON.stringify({ "event": "blockchain-confirmation", "data": { "transaction_id": hash } }));
+                if (this.events['blockchain-hash']) {
+                    this.events['blockchain-hash'].bind(this)({
+                        event: event,
+                        confirmationHash: transactionHash,
+                        transactionHash: hash
+                    });
+                }
+                return this.connection.send(JSON.stringify({ "event": event, "data": transactionHash, "meta": { "transaction_hash": hash } }));
             })
             .catch((e) => {
                 if (this.events['blockchain-error']) {
@@ -97,19 +117,19 @@ export default class Channel {
 
             // Fire event listeners
             if (message.event) {
-                if (this.events[message.event]) {
-                    this.events[message.event].bind(this)(message.data);
+                if (this.listeners[message.event]) {
+                    this.listeners[message.event].bind(this)(message.data, message.meta);
                 }
 
-                if (this.events["*"]) {
-                    this.events["*"].bind(this)(message.event, message.data);
+                if (this.listeners["*"]) {
+                    this.listeners["*"].bind(this)(message.event, message.data, message.meta);
                 }
             }
         } catch (jsonException) {
             console.error(jsonException);
         }
 
-        //User defined callback
+        //Fire lifecycle callback
         if (this.events['message']) {
             this.events['message'].bind(this)(e);
         }
