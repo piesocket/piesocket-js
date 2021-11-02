@@ -56,8 +56,13 @@ export default class Blockchain {
 
 				const bacmHash = await this.getTransactionHash(message);
 
-				const receipt = this.contract.methods.send(bacmHash).send({ from: this.account });
-				receipt.on('transactionHash', resolve)
+				const receipt = this.contract.methods.send(bacmHash.payload).send({ from: this.account });
+				receipt.on('transactionHash', (hash) => {
+					resolve({
+						hash: hash,
+						id: bacmHash.transaction_id
+					});
+				})
 				receipt.on('error', (error) => {
 					reject(error);
 				});

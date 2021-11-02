@@ -65,16 +65,16 @@ export default class Channel {
             this.blockchain = new Blockchain(this.identity.apiKey, this.identity.channelId);
         }
         this.blockchain.send(data)
-            .then((hash) => {
+            .then((receipt) => {
                 if (this.events['blockchain-hash']) {
                     this.events['blockchain-hash'].bind(this)({
                         event: event,
                         data: data,
                         meta: meta,
-                        transactionHash: hash
+                        transactionHash: receipt.hash
                     });
                 }
-                return this.connection.send(JSON.stringify({ "event": event, "data": data, "meta": { ...meta, "transaction_hash": hash } }));
+                return this.connection.send(JSON.stringify({ "event": event, "data": data, "meta": { ...meta, "transaction_id": receipt.id, "transaction_hash": receipt.hash } }));
             })
             .catch((e) => {
                 if (this.events['blockchain-error']) {
