@@ -74,7 +74,7 @@ export default class Blockchain {
 
 			data.append("apiKey", this.apiKey);
 			data.append("channel", this.channel);
-			data.append("message", message);
+			data.append("message", JSON.stringify(message));
 
 			var xhr = new XMLHttpRequest();
 
@@ -98,6 +98,7 @@ export default class Blockchain {
 					}
 				}
 			});
+
 			xhr.addEventListener('error', () => {
 				console.error("Blockchain Messaging API seems unreachable at the moment, try later");
 				reject();
