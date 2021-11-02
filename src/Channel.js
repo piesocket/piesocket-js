@@ -38,9 +38,22 @@ export default class Channel {
         this.events[event] = callback;
     }
 
+    listen(event, callback) {
+        this.events[event] = callback;
+    }
+
+
     send(data){
         return this.connection.send(data);
     }
+
+    publish(event, data) {
+        return this.connection.send(JSON.stringify({
+            event: event,
+            data: data
+        }));
+    }
+
 
     sendOnBlockchain(data) {
         if (!this.blockchain) {
@@ -48,7 +61,7 @@ export default class Channel {
         }
         this.blockchain.send(data)
             .then((hash) => {
-                return this.connection.send(JSON.stringify({ "message": data, "transaction_id": hash }));
+                return this.connection.send(JSON.stringify({ "event": "blockchain-message", "data": { "message": data, "transaction_id": hash } }));
             })
             .catch((e) => {
                 if (this.events['blockchain-error']) {
@@ -64,7 +77,7 @@ export default class Channel {
 
         this.blockchain.confirm(transactionHash)
             .then((hash) => {
-                return this.connection.send(JSON.stringify({ "event": "confirm-transaction", "transaction_id": hash }));
+                return this.connection.send(JSON.stringify({ "event": "blockchain-confirmation", "data": { "transaction_id": hash } }));
             })
             .catch((e) => {
                 if (this.events['blockchain-error']) {
@@ -80,6 +93,17 @@ export default class Channel {
             var message = JSON.parse(e.data);
             if (message.error && message.error.length) {
                 this.shouldReconnect = false;
+            }
+
+            // Fire event listeners
+            if (message.event) {
+                if (this.events[message.event]) {
+                    this.events[message.event].bind(this)(message.data);
+                }
+
+                if (this.events["*"]) {
+                    this.events["*"].bind(this)(message.event, message.data);
+                }
             }
         } catch (jsonException) {
             console.error(jsonException);

@@ -35,9 +35,9 @@ With CDN/Browser:
 
 Use the `PieSocket` global variable
 
-## Subscribe on frontend 
+## Subscribe On Frontend 
 
-1. Initialize the PieSocket class:
+1. Initialize PieSocket:
 ```javascript
 var piesocket = new PieSocket({
     clusterId: 'YOUR_CLUSTER_ID',
@@ -51,42 +51,46 @@ Reference: [Complete list of configuration options](https://github.com/piesocket
 2. Subscribe to a channel:
 ```javascript
 var channel = piesocket.subscribe(channelId); 
-
-channel.on("open", ()=>{
-  console.log("PieSocket Channel Connected!");
-});
 ```
 
 
-3. Listen to message event:
+3. Listen to an event:
 ```javascript
-channel.on('message', function(event){
-    console.log(event.data);
+channel.listen('event-name', function(data){
+    console.log(`event-name published with data: ${data}`);
 });
 ```
-Use `JSON.parse` on `event.data` if it is json.
+or, Listen to all events:
+```javascript
+channel.listen('*', function(event, data){
+    console.log(`${event} published with data: ${data}`);
+});
+```
 
-Following are other supported events:
+4. Listen to lifecycle events
+```javascript
+channel.on('open', function(event){
+    console.log("PieSocket connected!");
+});
+```
+
+Following life-cycle events are available:
   - `open`
   - `message`
   - `error`
   - `close`
 
-## Publish from browser
+## Publish Events From Browser
 
-You can enable `C2C` (Client to client) communication for your API key from your PieSocket account to use the `send` method of the Channel object to send messages directly from a client.
+You can publish messages directly from the client. Enable `C2C` (Client to client) communication for the API key from your [PieSocket account](https://www.piesocket.com/dashboard) to do the following.
+
 ```javascript
-channel.send(stringText);
+channel.publish("event-name", jsonPayload);
 ```
 
-To send JSON, use following code:
-```javascript
-channel.send(JSON.stringify(payload));
-```
+Make sure to call the `publish` method after connection has been made i.e `on('open', callback)` has been called.
 
-Make sure you are calling `send` method after connection has been made i.e `on('open', callback)` has been called.
-
-## Publish from server
+## Publish Events From Server
 Use the following POST request to publish a message from your server.
 
 ```
@@ -95,42 +99,61 @@ Host: CLUSTER_ID.piesocket.com
 Content-Type: application/json
 
 {
-    "key": "API_KEY",
-    "secret": "API_SECRET",
-    "channelId": "CHANNEL_ID",
-    "message": "Hello world!"
+  "key": "API_KEY",
+  "secret": "API_SECRET",
+  "channelId": "CHANNEL_ID",
+  "message": {"event":"new-tweet", "data":"Hello @PieSocketAPI!"}
 }
 ```
-See code examples for this request in PHP, NodeJS, Ruby, Python, Java and Go in our [official documentation](https://www.piesocket.com/docs/3.0/overview).
+See code examples for this request in PHP, NodeJS, Ruby, Python, Java, and Go in [PieSocket documentation](https://www.piesocket.com/docs/3.0/overview).
 
 ## Blockchain Realtime
 Send 100% trustworthy messages to connected peers and maintain a proof of the message on the Ethereum Blockchain network. 
 
 To send a message on the Blockhain
 ```javascript
-channel.sendOnBlockchain(payload);
+channel.sendOnBlockchain(jsonPayload);
 ```
 `payload` should be a string. 
 You will have to sign this message using the [MetaMask](https://metamask.io/download) Ethereum Wallet.
 
+To listen to an incoming Blockchain message.
+```javascript
+channel.listen("blockchain-message", function(data){
+  console.log(data);
+});
+```
+
 Optinally, to confirm a message on the receiver's end, to create a proof-of-acceptance on the Blockchain. Use the following method.
 ```javascript
-channel.confirmOnBlockchain(transactionHash);
+channel.listen("blockchain-message", function(data){
+  channel.confirmOnBlockchain(data.transaction_id);
+})
 ```
-`transactionHash` is the transaction hash received from the blockchain message sender.
+`transaction_id` is the transaction hash received with a blockchain message.
 
 To get a list of blockchain messages pending acceptance, use the [REST API](https://www.piesocket.com/docs/3.0/rest-api).
 
-## Supported Methods
+## PieSocket Methods
 List of available methods on the `PieSocket` object
 
 | Method                | Description                                     | Returns  |
 | ----------------------------- | ----------------------------------------------------------------------------- | -------------- |
-| subscribe(channelId)    | Subscribe to a channel                       |  Channel Object |
-| unsubscribe(channelId)  | Un-subscribe from a channel                  |  Boolean |
-| getConnections()        | Get list of all active connections/channels for this client | Object |
+| subscribe(channelId)    | Subscribe to a channel.                       |  Channel Object |
+| unsubscribe(channelId)  | Un-subscribe from a channel.                  |  Boolean |
+| getConnections()        | Get list of all active connections/channels for this client. | Object |
 
 
+## PieSocket Channel Methods
+List of available methods on the `Channel` object
+
+| Method                | Description                                     
+| ----------------------------- | ----------------------------------------------------------------------------- 
+| listen("event-name", callback)    | Listen to an event.           
+| publish("event-name", jsonPayload)  | Publish message from client.         
+| on("websocket-event", callback)        | Listen to lifecycle events on the native [WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API) connection.
+| sendOnBlockchain(payload)        | Send a Blockchain message and create a proof-of-event on the Ethereum blockchain.
+| confirmOnBlockchain(transaction_hash)        | Create a proof-of-witness for a Blockchain message, on receiver's end.
 
 
 ## Configuration
@@ -138,16 +161,16 @@ Complete list of allowed configuration options
 
 | Option                | Description                                     | Default  |
 | ----------------------------- | ----------------------------------------------------------------------------- | -------------- |
-| apiKey             | Required, Your PieSocket API key                |  Demo key |
-| clusterId          | Required, Your API key's cluster ID                       |  `demo` |
-| consoleLogs        | Logs useful connection info if set to `true`                       |  `false` |
-| notifySelf        | Receive messages sent by self, pass `0` to disabled                        |  `1` |
-| jwt        | JWT authentication token, skips authentication endpoint call                        |  `null` |
-| presence        | Enable presence events, pass `1` to enabled                     |  `0` |
-| authEndpoint        | Authentication endpoint for private channels                     |  `/broadcasting/auth` |
-| authHeaders        | Headers to include with authEndpoint call                   |  `{}` |
-| forceAuth        | Force authentication on all channels                    |  `false` |
-| userId        | User ID, used when `user` does not exists in JWT payload     |  `anonymous` |
+| apiKey             | Required, Your PieSocket API key.                |  Demo key |
+| clusterId          | Required, Your API key's cluster ID.                       |  `demo` |
+| consoleLogs        | Logs useful connection info if set to `true`.                       |  `false` |
+| notifySelf        | Receive messages sent by self, pass `0` to disabled.                        |  `1` |
+| jwt        | JWT authentication token, skips authentication endpoint call.                        |  `null` |
+| presence        | Enable presence events on any channel, pass `1` to enabled.                     |  `0` |
+| authEndpoint        | Authentication endpoint for private channels.                     |  `/broadcasting/auth` |
+| authHeaders        | Headers to include with authEndpoint call.                   |  `{}` |
+| forceAuth        | Force authentication on all channels.                    |  `false` |
+| userId        | User ID, used when `user` does not exists in JWT payload.     |  `anonymous` |
 
   
 ## Development
