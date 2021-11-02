@@ -159,7 +159,7 @@ List of available methods on the `Channel` object
 | listen("event-name", callback)    | Listen to an event.           
 | publish("event-name", data, meta)  | Publish message from client.         
 | on("lifecycle-event", callback)        | Listen to lifecycle events on the native [WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API) connection.
-| setBlockchainTestMode(testModeEnabled)        | Enable/disable test mode, defaults to `false` i.e., production.
+| setBlockchainTestMode(testModeEnabled)        | Enable/disable test mode, defaults to `false` i.e., Ethreum main network. Set to `true` for Rinkeby test network.
 | confirmOnBlockchain(event, transaction_hash)        | Create a proof-of-witness for a Blockchain message, on receiver's end.
 
 
