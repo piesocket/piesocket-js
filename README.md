@@ -60,6 +60,12 @@ channel.listen('event-name', function(data){
     console.log(`event-name published with data: ${data}`);
 });
 ```
+or, Listen to all events:
+```javascript
+channel.listen('*', function(event, data){
+    console.log(`${event} published with data: ${data}`);
+});
+```
 
 4. Listen to lifecycle events
 ```javascript
