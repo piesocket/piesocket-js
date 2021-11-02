@@ -35,9 +35,9 @@ With CDN/Browser:
 
 Use the `PieSocket` global variable
 
-## Subscribe on frontend 
+## Subscribe On Frontend 
 
-1. Initialize the PieSocket class:
+1. Initialize PieSocket:
 ```javascript
 var piesocket = new PieSocket({
     clusterId: 'YOUR_CLUSTER_ID',
@@ -51,17 +51,13 @@ Reference: [Complete list of configuration options](https://github.com/piesocket
 2. Subscribe to a channel:
 ```javascript
 var channel = piesocket.subscribe(channelId); 
-
-channel.on("open", ()=>{
-  console.log("PieSocket Channel Connected!");
-});
 ```
 
 
 3. Listen to an event:
 ```javascript
-channel.listen('event-name', function(event){
-    console.log(event.data);
+channel.listen('event-name', function(data){
+    console.log(`event-name published with data: ${data}`);
 });
 ```
 
