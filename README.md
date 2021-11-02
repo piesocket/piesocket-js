@@ -112,7 +112,7 @@ Send 100% trustworthy messages to connected peers and maintain a proof of the me
 
 To send a message on the Blockhain
 ```javascript
-channel.sendOnBlockchain(payload);
+channel.sendOnBlockchain(jsonPayload);
 ```
 `payload` should be a string. 
 You will have to sign this message using the [MetaMask](https://metamask.io/download) Ethereum Wallet.
@@ -130,30 +130,30 @@ channel.listen("blockchain-message", function(data){
   channel.confirmOnBlockchain(data.transaction_id);
 })
 ```
-`transactionHash` is the transaction hash received from the blockchain message sender.
+`transaction_id` is the transaction hash received with a blockchain message.
 
 To get a list of blockchain messages pending acceptance, use the [REST API](https://www.piesocket.com/docs/3.0/rest-api).
 
-## PiSocket Methods
+## PieSocket Methods
 List of available methods on the `PieSocket` object
 
 | Method                | Description                                     | Returns  |
 | ----------------------------- | ----------------------------------------------------------------------------- | -------------- |
-| subscribe(channelId)    | Subscribe to a channel                       |  Channel Object |
-| unsubscribe(channelId)  | Un-subscribe from a channel                  |  Boolean |
-| getConnections()        | Get list of all active connections/channels for this client | Object |
+| subscribe(channelId)    | Subscribe to a channel.                       |  Channel Object |
+| unsubscribe(channelId)  | Un-subscribe from a channel.                  |  Boolean |
+| getConnections()        | Get list of all active connections/channels for this client. | Object |
 
 
-## PiSocket Channel Methods
+## PieSocket Channel Methods
 List of available methods on the `Channel` object
 
 | Method                | Description                                     
 | ----------------------------- | ----------------------------------------------------------------------------- 
-| listen("event-name", callback)    | Listen to an event                       
-| publish("event-name", jsonPayload)  | Un-subscribe from a channel                  
-| on("websocket-event")        | Listen to lifecycle events on the native [WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API) connection
-| sendOnBlockchain(payload)        | Send a Blockchain message and create a proof-of-event on the Ethereum blockchain
-| confirmOnBlockchain(transaction_hash)        | Create a proof-of-witness for a Blockchain message, on receiver's end
+| listen("event-name", callback)    | Listen to an event.           
+| publish("event-name", jsonPayload)  | Publish message from client.         
+| on("websocket-event", callback)        | Listen to lifecycle events on the native [WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API) connection.
+| sendOnBlockchain(payload)        | Send a Blockchain message and create a proof-of-event on the Ethereum blockchain.
+| confirmOnBlockchain(transaction_hash)        | Create a proof-of-witness for a Blockchain message, on receiver's end.
 
 
 ## Configuration
@@ -166,7 +166,7 @@ Complete list of allowed configuration options
 | consoleLogs        | Logs useful connection info if set to `true`                       |  `false` |
 | notifySelf        | Receive messages sent by self, pass `0` to disabled                        |  `1` |
 | jwt        | JWT authentication token, skips authentication endpoint call                        |  `null` |
-| presence        | Enable presence events, pass `1` to enabled                     |  `0` |
+| presence        | Enable presence events on any channel, pass `1` to enabled                     |  `0` |
 | authEndpoint        | Authentication endpoint for private channels                     |  `/broadcasting/auth` |
 | authHeaders        | Headers to include with authEndpoint call                   |  `{}` |
 | forceAuth        | Force authentication on all channels                    |  `false` |
