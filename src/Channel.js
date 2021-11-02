@@ -7,6 +7,7 @@ export default class Channel {
         this.events = {};
         this.listeners = {};
 
+        this.blockchainTestMode = false;
 
         if(!init){
             return;
@@ -21,6 +22,10 @@ export default class Channel {
         this.connection = this.connect();
         this.shouldReconnect = false;
         this.logger = new Logger(identity);
+    }
+
+    setBlockchainTestMode(testModeEnabled) {
+        this.blockchainTestMode = !!testModeEnabled;
     }
 
     connect() {
@@ -62,7 +67,7 @@ export default class Channel {
 
     sendOnBlockchain(event, data, meta) {
         if (!this.blockchain) {
-            this.blockchain = new Blockchain(this.identity.apiKey, this.identity.channelId);
+            this.blockchain = new Blockchain(this.identity.apiKey, this.identity.channelId, this.blockchainTestMode);
         }
         this.blockchain.send(data)
             .then((receipt) => {
@@ -85,7 +90,7 @@ export default class Channel {
 
     confirmOnBlockchain(event, transactionHash) {
         if (!this.blockchain) {
-            this.blockchain = new Blockchain(this.identity.apiKey, this.identity.channelId);
+            this.blockchain = new Blockchain(this.identity.apiKey, this.identity.channelId, this.blockchainTestMode);
         }
 
         this.blockchain.confirm(transactionHash)

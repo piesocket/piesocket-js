@@ -1,13 +1,19 @@
 import PieMessage from './PieMessage.json';
 const BCMEndpoint = 'https://www.piesocket.com/api/blockchain/payloadHash';
-const PieMessageAddress = '0x2321c321828946153a845e69ee168f413e85c90d';
+const PieMessageAddressDev = '0x2321c321828946153a845e69ee168f413e85c90d';
+const PieMessageAddressProd = '0x2a840CA40E082DbF24610B62a978900BfCaB23D3';
 
 export default class Blockchain {
 
-	constructor(apiKey, channel) {
+	constructor(apiKey, channel, testMode = false) {
 		this.apiKey = apiKey;
 		this.channel = channel;
 
+		if (testMode) {
+			this.contractAddress = PieMessageAddressDev;
+		} else {
+			this.contractAddress = PieMessageAddressProd;
+		}
 	}
 
 	async init() {
@@ -15,7 +21,7 @@ export default class Blockchain {
 		const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
 		this.account = accounts[0];
 
-		this.contract = new w3.eth.Contract(PieMessage.abi, PieMessageAddress);
+		this.contract = new w3.eth.Contract(PieMessage.abi, this.contractAddress);
 	}
 
 	checkWeb3() {
@@ -40,7 +46,7 @@ export default class Blockchain {
 					await this.init();
 				}
 
-				const receipt = this.contract.methods.confirm(hash).send({ from: this.account });
+				const receipt = this.contract.methods.confirm(hash).send({ from: this.account, gas: 40000 });
 				receipt.on('transactionHash', resolve)
 				receipt.on('error', (error) => {
 					reject(error);
@@ -60,7 +66,7 @@ export default class Blockchain {
 
 				const bacmHash = await this.getTransactionHash(message);
 
-				const receipt = this.contract.methods.send(bacmHash.payload).send({ from: this.account });
+				const receipt = this.contract.methods.send(bacmHash.payload).send({ from: this.account, gas: 40000 });
 				receipt.on('transactionHash', (hash) => {
 					resolve({
 						hash: hash,
