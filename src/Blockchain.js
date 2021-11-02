@@ -8,9 +8,6 @@ export default class Blockchain {
 		this.apiKey = apiKey;
 		this.channel = channel;
 
-		if (this.checkWeb3()) {
-			this.init();
-		}
 	}
 
 	async init() {
@@ -39,6 +36,10 @@ export default class Blockchain {
 		return new Promise(async (resolve, reject) => {
 
 			if (this.checkWeb3()) {
+				if (!this.contract) {
+					await this.init();
+				}
+
 				const receipt = this.contract.methods.confirm(hash).send({ from: this.account });
 				receipt.on('transactionHash', resolve)
 				receipt.on('error', (error) => {
@@ -53,6 +54,9 @@ export default class Blockchain {
 		return new Promise(async (resolve, reject) => {
 
 			if (this.checkWeb3()) {
+				if (!this.contract) {
+					await this.init();
+				}
 
 				const bacmHash = await this.getTransactionHash(message);
 

@@ -85,7 +85,7 @@ export default class Channel {
 
     confirmOnBlockchain(event, transactionHash) {
         if (!this.blockchain) {
-            this.blockchain = new Blockchain(identity.apiKey, identity.channelId);
+            this.blockchain = new Blockchain(this.identity.apiKey, this.identity.channelId);
         }
 
         this.blockchain.confirm(transactionHash)
@@ -97,7 +97,7 @@ export default class Channel {
                         transactionHash: hash
                     });
                 }
-                return this.connection.send(JSON.stringify({ "event": event, "data": transactionHash, "meta": { "transaction_hash": hash } }));
+                return this.connection.send(JSON.stringify({ "event": event, "data": transactionHash, "meta": { "transaction_id": 1, "transaction_hash": hash } }));
             })
             .catch((e) => {
                 if (this.events['blockchain-error']) {
