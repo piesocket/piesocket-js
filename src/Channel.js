@@ -48,7 +48,7 @@ export default class Channel {
         }
         this.blockchain.send(data)
             .then((hash) => {
-                return this.connection.send(JSON.stringify({ "message": data, "transaction_id": hash }));
+                return this.connection.send(JSON.stringify({ "event": "blockchain-message", "data": { "message": data, "transaction_id": hash } }));
             })
             .catch((e) => {
                 if (this.events['blockchain-error']) {
@@ -64,7 +64,7 @@ export default class Channel {
 
         this.blockchain.confirm(transactionHash)
             .then((hash) => {
-                return this.connection.send(JSON.stringify({ "event": "confirm-transaction", "transaction_id": hash }));
+                return this.connection.send(JSON.stringify({ "event": "blockchain-confirmation", "data": { "transaction_id": hash } }));
             })
             .catch((e) => {
                 if (this.events['blockchain-error']) {
