@@ -78,9 +78,9 @@ channel.on('open', function(event){
 Following life-cycle events are available:
   - `open`: Fired when WebSocket connect is established.
   - `message`: Fired when WebSocket message is received.
-  - `error`: Fired when WebSocket connection error occurs.
+  - `error`: Fired when WebSocket connection errors occur.
   - `close`: Fired when WebSocket connection is closed.
-  - `blockchain-error`: Fired when Blockchain error occurs.
+  - `blockchain-error`: Fired when Blockchain errors occur.
   - `blockchain-hash`:  Fired when Blockchain contract's transaction hash is available.
 
 ## Publish Events From Browser
@@ -109,7 +109,7 @@ Content-Type: application/json
   "key": "API_KEY",
   "secret": "API_SECRET",
   "channelId": "CHANNEL_ID",
-  "message": { "event":"new-tweet", "data":"Hello @PieSocketAPI!", "meta":{ "user": 143 } }
+  "message": { "event": "new-tweet", "data": { "text": "Hello @PieSocketAPI!" }, "meta": { "user": 143 } }
 }
 ```
 See code examples for this request in PHP, NodeJS, Ruby, Python, Java, and Go in [PieSocket documentation](https://www.piesocket.com/docs/3.0/overview).
@@ -124,13 +124,13 @@ channel.publish("event-name", data, {
 });
 ```
 `payload` should be a string. 
-You will have to sign this message using the [MetaMask](https://metamask.io/download) Ethereum Wallet.
+User will have to sign this message using the [MetaMask](https://metamask.io/download) Ethereum Wallet.
 
 Optinally, to confirm a message on the receiver's end, to create a proof-of-acceptance on the Blockchain. Use the following method.
 ```javascript
 channel.listen("event-name", function(data, meta){
   if(meta && meta.blockchain && meta.transaction_hash){
-    //This is blockchain message, confirm as witness of event.
+    //This is blockchain message, accept the contract on Ethereum blockchain.
     channel.confirmOnBlockchain("blockchain-confirmation", meta.transaction_hash);
   }
 })
@@ -157,10 +157,9 @@ List of available methods on the `Channel` object
 | Method                | Description                                     
 | ----------------------------- | ----------------------------------------------------------------------------- 
 | listen("event-name", callback)    | Listen to an event.           
-| publish("event-name", jsonPayload)  | Publish message from client.         
-| on("websocket-event", callback)        | Listen to lifecycle events on the native [WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API) connection.
-| sendOnBlockchain(payload)        | Send a Blockchain message and create a proof-of-event on the Ethereum blockchain.
-| confirmOnBlockchain(transaction_hash)        | Create a proof-of-witness for a Blockchain message, on receiver's end.
+| publish("event-name", data, meta)  | Publish message from client.         
+| on("lifecycle-event", callback)        | Listen to lifecycle events on the native [WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API) connection.
+| confirmOnBlockchain(event, transaction_hash)        | Create a proof-of-witness for a Blockchain message, on receiver's end.
 
 
 ## Configuration
