@@ -14,7 +14,9 @@ const defaultOptions = {
     authEndpoint: "/broadcasting/auth",
     authHeaders: {},
     forceAuth: false, 
-    userId: null
+    userId: null,
+    blockchainTestMode: false,
+    blockchainGasFee: 41000
 }
 
 export default class PieSocket {

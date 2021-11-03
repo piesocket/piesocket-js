@@ -159,7 +159,6 @@ List of available methods on the `Channel` object
 | listen("event-name", callback)    | Listen to an event.           
 | publish("event-name", data, meta)  | Publish message from client.         
 | on("lifecycle-event", callback)        | Listen to lifecycle events on the native [WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API) connection.
-| setBlockchainTestMode(testModeEnabled)        | Enable/disable test mode, defaults to `false` i.e., Ethreum main network. Set to `true` for Rinkeby test network.
 | confirmOnBlockchain(event, transaction_hash)        | Create a proof-of-witness for a Blockchain message, on receiver's end.
 
 
@@ -178,6 +177,8 @@ Complete list of allowed configuration options
 | authHeaders        | Headers to include with authEndpoint call.                   |  `{}` |
 | forceAuth        | Force authentication on all channels.                    |  `false` |
 | userId        | User ID, used when `user` does not exists in JWT payload.     |  `anonymous` |
+| blockchainTestMode        | Enable/disable test mode, defaults to `false` i.e., Ethreum main network. Set to `true` for Rinkeby test network.     |  `false` |
+| blockchainGasFee        | Gas fee to set on Ethreum contract calls     |  `41000` |
 
   
 ## Development

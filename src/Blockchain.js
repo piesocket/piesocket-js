@@ -5,11 +5,15 @@ const PieMessageAddressProd = '0x2a840CA40E082DbF24610B62a978900BfCaB23D3';
 
 export default class Blockchain {
 
-	constructor(apiKey, channel, testMode = false) {
-		this.apiKey = apiKey;
-		this.channel = channel;
+	constructor(options) {
+		this.options = options;
 
-		if (testMode) {
+		this.apiKey = this.options.apiKey;
+		this.channel = this.options.channelId;
+		this.blockchainTestMode = this.options.blockchainTestMode;
+		this.blockchainGasFee = this.options.blockchainGasFee;
+
+		if (this.blockchainTestMode) {
 			this.contractAddress = PieMessageAddressDev;
 		} else {
 			this.contractAddress = PieMessageAddressProd;
@@ -46,7 +50,7 @@ export default class Blockchain {
 					await this.init();
 				}
 
-				const receipt = this.contract.methods.confirm(hash).send({ from: this.account, gas: 40000 });
+				const receipt = this.contract.methods.confirm(hash).send({ from: this.account, gas: this.blockchainGasFee });
 				receipt.on('transactionHash', resolve)
 				receipt.on('error', (error) => {
 					reject(error);
@@ -66,7 +70,7 @@ export default class Blockchain {
 
 				const bacmHash = await this.getTransactionHash(message);
 
-				const receipt = this.contract.methods.send(bacmHash.payload).send({ from: this.account, gas: 40000 });
+				const receipt = this.contract.methods.send(bacmHash.payload).send({ from: this.account, gas: this.blockchainGasFee });
 				receipt.on('transactionHash', (hash) => {
 					resolve({
 						hash: hash,
@@ -94,6 +98,7 @@ export default class Blockchain {
 			data.append("apiKey", this.apiKey);
 			data.append("channel", this.channel);
 			data.append("message", JSON.stringify(message));
+			data.append("contract", this.contractAddress);
 
 			var xhr = new XMLHttpRequest();
 
