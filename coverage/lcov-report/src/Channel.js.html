@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">22.38% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/67</span>
+                <span class='fraction'>15/67</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">5.12% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/39</span>
+                <span class='fraction'>2/39</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">16.66% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/18</span>
+                <span class='fraction'>3/18</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">22.38% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/67</span>
+                <span class='fraction'>15/67</span>
             </div>
         
             
@@ -237,39 +237,38 @@
 <a name='L172'></a><a href='#L172'>172</a>
 <a name='L173'></a><a href='#L173'>173</a>
 <a name='L174'></a><a href='#L174'>174</a>
-<a name='L175'></a><a href='#L175'>175</a>
-<a name='L176'></a><a href='#L176'>176</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L175'></a><a href='#L175'>175</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -410,192 +409,190 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import Logger from './Logger.js';
 import Blockchain from './Blockchain';
+import Socket from './Socket';
 &nbsp;
 export default class Channel {
+  constructor(endpoint, identity, init=true) {
+    this.events = {};
+    this.listeners = {};
 &nbsp;
-<span class="fstat-no" title="function not covered" >    co</span>nstructor(endpoint, identity, init=<span class="branch-0 cbranch-no" title="branch not covered" >true)</span> {
-<span class="cstat-no" title="statement not covered" >        this.events = {};</span>
-<span class="cstat-no" title="statement not covered" >        this.listeners = {};</span>
-&nbsp;
-<span class="cstat-no" title="statement not covered" >        if(!init){</span>
-<span class="cstat-no" title="statement not covered" >            return;</span>
-        }
-&nbsp;
-<span class="cstat-no" title="statement not covered" >        this.init(endpoint, identity);</span>
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (!init) {
+<span class="cstat-no" title="statement not covered" >      return;</span>
     }
 &nbsp;
-<span class="fstat-no" title="function not covered" >    in</span>it(endpoint, identity){        
-<span class="cstat-no" title="statement not covered" >        this.endpoint = endpoint;</span>
-<span class="cstat-no" title="statement not covered" >        this.identity = identity;</span>
-<span class="cstat-no" title="statement not covered" >        this.connection = this.connect();</span>
+    this.init(endpoint, identity);
+  }
+&nbsp;
+  init(endpoint, identity) {
+    this.endpoint = endpoint;
+    this.identity = identity;
+    this.connection = this.connect();
+    this.shouldReconnect = false;
+    this.logger = new Logger(identity);
+  }
+&nbsp;
+  connect() {
+    const connection = new Socket(this.endpoint);
+    connection.onmessage = this.onMessage.bind(this);
+    connection.onopen = this.onOpen.bind(this);
+    connection.onerror = this.onError.bind(this);
+    connection.onclose = this.onClose.bind(this);
+&nbsp;
+    return connection;
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  on</span>(event, callback) {
+    // Register lifecycle callbacks
+<span class="cstat-no" title="statement not covered" >    this.events[event] = callback;</span>
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  li</span>sten(event, callback) {
+    // Register user defined callbacks
+<span class="cstat-no" title="statement not covered" >    this.listeners[event] = callback;</span>
+  }
+&nbsp;
+&nbsp;
+<span class="fstat-no" title="function not covered" >  se</span>nd(data) {
+<span class="cstat-no" title="statement not covered" >    return this.connection.send(data);</span>
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  pu</span>blish(event, data, meta) {
+<span class="cstat-no" title="statement not covered" >    if (meta &amp;&amp; meta.blockchain) {</span>
+<span class="cstat-no" title="statement not covered" >      return this.sendOnBlockchain(event, data, meta);</span>
+    }
+<span class="cstat-no" title="statement not covered" >    return this.connection.send(JSON.stringify({</span>
+      event: event,
+      data: data,
+      meta: meta,
+    }));
+  }
+&nbsp;
+&nbsp;
+<span class="fstat-no" title="function not covered" >  se</span>ndOnBlockchain(event, data, meta) {
+<span class="cstat-no" title="statement not covered" >    if (!this.blockchain) {</span>
+<span class="cstat-no" title="statement not covered" >      this.blockchain = new Blockchain(this.identity);</span>
+    }
+<span class="cstat-no" title="statement not covered" >    this.blockchain.send(data)</span>
+        .then(<span class="fstat-no" title="function not covered" >(r</span>eceipt) =&gt; {
+<span class="cstat-no" title="statement not covered" >          if (this.events['blockchain-hash']) {</span>
+<span class="cstat-no" title="statement not covered" >            this.events['blockchain-hash'].bind(this)({</span>
+              event: event,
+              data: data,
+              meta: meta,
+              transactionHash: receipt.hash,
+            });
+          }
+<span class="cstat-no" title="statement not covered" >          return this.connection.send(JSON.stringify({'event': event, 'data': data, 'meta': {...meta, 'transaction_id': receipt.id, 'transaction_hash': receipt.hash}}));</span>
+        })
+        .catch(<span class="fstat-no" title="function not covered" >(e</span>) =&gt; {
+<span class="cstat-no" title="statement not covered" >          if (this.events['blockchain-error']) {</span>
+<span class="cstat-no" title="statement not covered" >            this.events['blockchain-error'].bind(this)(e);</span>
+          }
+        });
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  co</span>nfirmOnBlockchain(event, transactionHash) {
+<span class="cstat-no" title="statement not covered" >    if (!this.blockchain) {</span>
+<span class="cstat-no" title="statement not covered" >      this.blockchain = new Blockchain(this.identity);</span>
+    }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    this.blockchain.confirm(transactionHash)</span>
+        .then(<span class="fstat-no" title="function not covered" >(h</span>ash) =&gt; {
+<span class="cstat-no" title="statement not covered" >          if (this.events['blockchain-hash']) {</span>
+<span class="cstat-no" title="statement not covered" >            this.events['blockchain-hash'].bind(this)({</span>
+              event: event,
+              confirmationHash: transactionHash,
+              transactionHash: hash,
+            });
+          }
+<span class="cstat-no" title="statement not covered" >          return this.connection.send(JSON.stringify({'event': event, 'data': transactionHash, 'meta': {'transaction_id': 1, 'transaction_hash': hash}}));</span>
+        })
+        .catch(<span class="fstat-no" title="function not covered" >(e</span>) =&gt; {
+<span class="cstat-no" title="statement not covered" >          if (this.events['blockchain-error']) {</span>
+<span class="cstat-no" title="statement not covered" >            this.events['blockchain-error'].bind(this)(e);</span>
+          }
+        });
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  on</span>Message(e) {
+<span class="cstat-no" title="statement not covered" >    this.logger.log('Channel message:', e);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    try {</span>
+      const message = <span class="cstat-no" title="statement not covered" >JSON.parse(e.data);</span>
+<span class="cstat-no" title="statement not covered" >      if (message.error &amp;&amp; message.error.length) {</span>
 <span class="cstat-no" title="statement not covered" >        this.shouldReconnect = false;</span>
-<span class="cstat-no" title="statement not covered" >        this.logger = new Logger(identity);</span>
-    }
+      }
 &nbsp;
-<span class="fstat-no" title="function not covered" >    co</span>nnect() {
-        var connection = <span class="cstat-no" title="statement not covered" >new WebSocket(this.endpoint);</span>
-<span class="cstat-no" title="statement not covered" >        connection.onmessage = this.onMessage.bind(this);</span>
-<span class="cstat-no" title="statement not covered" >        connection.onopen = this.onOpen.bind(this);</span>
-<span class="cstat-no" title="statement not covered" >        connection.onerror = this.onError.bind(this);</span>
-<span class="cstat-no" title="statement not covered" >        connection.onclose = this.onClose.bind(this);</span>
-&nbsp;
-<span class="cstat-no" title="statement not covered" >        return connection;</span>
-    }
-&nbsp;
-<span class="fstat-no" title="function not covered" >    on</span>(event, callback) {
-        //Register lifecycle callbacks
-<span class="cstat-no" title="statement not covered" >        this.events[event] = callback;</span>
-    }
-&nbsp;
-<span class="fstat-no" title="function not covered" >    li</span>sten(event, callback) {
-        //Register user defined callbacks
-<span class="cstat-no" title="statement not covered" >        this.listeners[event] = callback;</span>
-    }
-&nbsp;
-&nbsp;
-<span class="fstat-no" title="function not covered" >    se</span>nd(data){
-<span class="cstat-no" title="statement not covered" >        return this.connection.send(data);</span>
-    }
-&nbsp;
-<span class="fstat-no" title="function not covered" >    pu</span>blish(event, data, meta) {
-<span class="cstat-no" title="statement not covered" >        if (meta &amp;&amp; meta.blockchain) {</span>
-<span class="cstat-no" title="statement not covered" >            return this.sendOnBlockchain(event, data, meta);</span>
-        }
-<span class="cstat-no" title="statement not covered" >        return this.connection.send(JSON.stringify({</span>
-            event: event,
-            data: data,
-            meta: meta
-        }));
-    }
-&nbsp;
-&nbsp;
-<span class="fstat-no" title="function not covered" >    se</span>ndOnBlockchain(event, data, meta) {
-<span class="cstat-no" title="statement not covered" >        if (!this.blockchain) {</span>
-<span class="cstat-no" title="statement not covered" >            this.blockchain = new Blockchain(this.identity);</span>
-        }
-<span class="cstat-no" title="statement not covered" >        this.blockchain.send(data)</span>
-            .then(<span class="fstat-no" title="function not covered" >(r</span>eceipt) =&gt; {
-<span class="cstat-no" title="statement not covered" >                if (this.events['blockchain-hash']) {</span>
-<span class="cstat-no" title="statement not covered" >                    this.events['blockchain-hash'].bind(this)({</span>
-                        event: event,
-                        data: data,
-                        meta: meta,
-                        transactionHash: receipt.hash
-                    });
-                }
-<span class="cstat-no" title="statement not covered" >                return this.connection.send(JSON.stringify({ "event": event, "data": data, "meta": { ...meta, "transaction_id": receipt.id, "transaction_hash": receipt.hash } }));</span>
-            })
-            .catch(<span class="fstat-no" title="function not covered" >(e</span>) =&gt; {
-<span class="cstat-no" title="statement not covered" >                if (this.events['blockchain-error']) {</span>
-<span class="cstat-no" title="statement not covered" >                    this.events['blockchain-error'].bind(this)(e);</span>
-                }
-            });
-    }
-&nbsp;
-<span class="fstat-no" title="function not covered" >    co</span>nfirmOnBlockchain(event, transactionHash) {
-<span class="cstat-no" title="statement not covered" >        if (!this.blockchain) {</span>
-<span class="cstat-no" title="statement not covered" >            this.blockchain = new Blockchain(this.identity);</span>
+      // Fire event listeners
+<span class="cstat-no" title="statement not covered" >      if (message.event) {</span>
+<span class="cstat-no" title="statement not covered" >        if (this.listeners[message.event]) {</span>
+<span class="cstat-no" title="statement not covered" >          this.listeners[message.event].bind(this)(message.data, message.meta);</span>
         }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >        this.blockchain.confirm(transactionHash)</span>
-            .then(<span class="fstat-no" title="function not covered" >(h</span>ash) =&gt; {
-<span class="cstat-no" title="statement not covered" >                if (this.events['blockchain-hash']) {</span>
-<span class="cstat-no" title="statement not covered" >                    this.events['blockchain-hash'].bind(this)({</span>
-                        event: event,
-                        confirmationHash: transactionHash,
-                        transactionHash: hash
-                    });
-                }
-<span class="cstat-no" title="statement not covered" >                return this.connection.send(JSON.stringify({ "event": event, "data": transactionHash, "meta": { "transaction_id": 1, "transaction_hash": hash } }));</span>
-            })
-            .catch(<span class="fstat-no" title="function not covered" >(e</span>) =&gt; {
-<span class="cstat-no" title="statement not covered" >                if (this.events['blockchain-error']) {</span>
-<span class="cstat-no" title="statement not covered" >                    this.events['blockchain-error'].bind(this)(e);</span>
-                }
-            });
+<span class="cstat-no" title="statement not covered" >        if (this.listeners['*']) {</span>
+<span class="cstat-no" title="statement not covered" >          this.listeners['*'].bind(this)(message.event, message.data, message.meta);</span>
+        }
+      }
+    } catch (jsonException) {
+<span class="cstat-no" title="statement not covered" >      console.error(jsonException);</span>
     }
 &nbsp;
-<span class="fstat-no" title="function not covered" >    on</span>Message(e) {
-<span class="cstat-no" title="statement not covered" >        this.logger.log('Channel message:', e);</span>
-&nbsp;
-<span class="cstat-no" title="statement not covered" >        try {</span>
-            var message = <span class="cstat-no" title="statement not covered" >JSON.parse(e.data);</span>
-<span class="cstat-no" title="statement not covered" >            if (message.error &amp;&amp; message.error.length) {</span>
-<span class="cstat-no" title="statement not covered" >                this.shouldReconnect = false;</span>
-            }
-&nbsp;
-            // Fire event listeners
-<span class="cstat-no" title="statement not covered" >            if (message.event) {</span>
-<span class="cstat-no" title="statement not covered" >                if (this.listeners[message.event]) {</span>
-<span class="cstat-no" title="statement not covered" >                    this.listeners[message.event].bind(this)(message.data, message.meta);</span>
-                }
-&nbsp;
-<span class="cstat-no" title="statement not covered" >                if (this.listeners["*"]) {</span>
-<span class="cstat-no" title="statement not covered" >                    this.listeners["*"].bind(this)(message.event, message.data, message.meta);</span>
-                }
-            }
-        } catch (jsonException) {
-<span class="cstat-no" title="statement not covered" >            console.error(jsonException);</span>
-        }
-&nbsp;
-        //Fire lifecycle callback
-<span class="cstat-no" title="statement not covered" >        if (this.events['message']) {</span>
-<span class="cstat-no" title="statement not covered" >            this.events['message'].bind(this)(e);</span>
-        }
+    // Fire lifecycle callback
+<span class="cstat-no" title="statement not covered" >    if (this.events['message']) {</span>
+<span class="cstat-no" title="statement not covered" >      this.events['message'].bind(this)(e);</span>
     }
+  }
 &nbsp;
-<span class="fstat-no" title="function not covered" >    on</span>Open(e) {
-<span class="cstat-no" title="statement not covered" >        this.logger.log('Channel connected:', e);</span>
-<span class="cstat-no" title="statement not covered" >        this.shouldReconnect = true;</span>
+<span class="fstat-no" title="function not covered" >  on</span>Open(e) {
+<span class="cstat-no" title="statement not covered" >    this.logger.log('Channel connected:', e);</span>
+<span class="cstat-no" title="statement not covered" >    this.shouldReconnect = true;</span>
 &nbsp;
-        //User defined callback
-<span class="cstat-no" title="statement not covered" >        if (this.events['open']) {</span>
-<span class="cstat-no" title="statement not covered" >            this.events['open'].bind(this)(e);</span>
-        }
+    // User defined callback
+<span class="cstat-no" title="statement not covered" >    if (this.events['open']) {</span>
+<span class="cstat-no" title="statement not covered" >      this.events['open'].bind(this)(e);</span>
     }
+  }
 &nbsp;
-<span class="fstat-no" title="function not covered" >    on</span>Error(e) {
-<span class="cstat-no" title="statement not covered" >        this.logger.error('Channel error:', e);</span>
-<span class="cstat-no" title="statement not covered" >        this.connection.close();</span>
+<span class="fstat-no" title="function not covered" >  on</span>Error(e) {
+<span class="cstat-no" title="statement not covered" >    this.logger.error('Channel error:', e);</span>
+<span class="cstat-no" title="statement not covered" >    this.connection.close();</span>
 &nbsp;
-        //User defined callback
-<span class="cstat-no" title="statement not covered" >        if (this.events['error']) {</span>
-<span class="cstat-no" title="statement not covered" >            this.events['error'].bind(this)(e);</span>
-        }
+    // User defined callback
+<span class="cstat-no" title="statement not covered" >    if (this.events['error']) {</span>
+<span class="cstat-no" title="statement not covered" >      this.events['error'].bind(this)(e);</span>
     }
+  }
 &nbsp;
-<span class="fstat-no" title="function not covered" >    on</span>Close(e) {
-<span class="cstat-no" title="statement not covered" >        this.logger.warn('Channel closed:', e);</span>
-<span class="cstat-no" title="statement not covered" >        this.reconnect();</span>
+<span class="fstat-no" title="function not covered" >  on</span>Close(e) {
+<span class="cstat-no" title="statement not covered" >    this.logger.warn('Channel closed:', e);</span>
+<span class="cstat-no" title="statement not covered" >    this.reconnect();</span>
 &nbsp;
-        //User defined callback
-<span class="cstat-no" title="statement not covered" >        if (this.events['close']) {</span>
-<span class="cstat-no" title="statement not covered" >            this.events['close'].bind(this)(e);</span>
-        }
+    // User defined callback
+<span class="cstat-no" title="statement not covered" >    if (this.events['close']) {</span>
+<span class="cstat-no" title="statement not covered" >      this.events['close'].bind(this)(e);</span>
     }
+  }
 &nbsp;
-<span class="fstat-no" title="function not covered" >    re</span>connect() {
-<span class="cstat-no" title="statement not covered" >        if (!this.shouldReconnect) {</span>
-<span class="cstat-no" title="statement not covered" >            return;</span>
-        }
-<span class="cstat-no" title="statement not covered" >        this.logger.log("Reconnecting");</span>
-<span class="cstat-no" title="statement not covered" >        this.connect();</span>
+<span class="fstat-no" title="function not covered" >  re</span>connect() {
+<span class="cstat-no" title="statement not covered" >    if (!this.shouldReconnect) {</span>
+<span class="cstat-no" title="statement not covered" >      return;</span>
     }
-&nbsp;
-&nbsp;
-}</pre></td></tr></table></pre>
+<span class="cstat-no" title="statement not covered" >    this.logger.log('Reconnecting');</span>
+<span class="cstat-no" title="statement not covered" >    this.connect();</span>
+  }
+}
+&nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
             </div><!-- /wrapper -->
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at Sat Jan 15 2022 14:16:34 GMT+0530 (India Standard Time)
+                at Sat Jan 15 2022 15:52:04 GMT+0530 (India Standard Time)
             </div>
         <script src="../prettify.js"></script>
         <script>

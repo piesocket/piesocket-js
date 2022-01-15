@@ -194,18 +194,13 @@
 <a name='L129'></a><a href='#L129'>129</a>
 <a name='L130'></a><a href='#L130'>130</a>
 <a name='L131'></a><a href='#L131'>131</a>
-<a name='L132'></a><a href='#L132'>132</a>
-<a name='L133'></a><a href='#L133'>133</a>
-<a name='L134'></a><a href='#L134'>134</a>
-<a name='L135'></a><a href='#L135'>135</a>
-<a name='L136'></a><a href='#L136'>136</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L132'></a><a href='#L132'>132</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -244,7 +239,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -260,9 +254,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -279,7 +271,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -331,6 +322,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import PieMessage from './PieMessage.json';
@@ -339,143 +331,139 @@ const PieMessageAddressDev = '0x2321c321828946153a845e69ee168f413e85c90d';
 const PieMessageAddressProd = '0x2a840CA40E082DbF24610B62a978900BfCaB23D3';
 &nbsp;
 export default class Blockchain {
+<span class="fstat-no" title="function not covered" >  co</span>nstructor(options) {
+<span class="cstat-no" title="statement not covered" >    this.options = options;</span>
 &nbsp;
-<span class="fstat-no" title="function not covered" >	co</span>nstructor(options) {
-<span class="cstat-no" title="statement not covered" >		this.options = options;</span>
+<span class="cstat-no" title="statement not covered" >    this.apiKey = this.options.apiKey;</span>
+<span class="cstat-no" title="statement not covered" >    this.channel = this.options.channelId;</span>
+<span class="cstat-no" title="statement not covered" >    this.blockchainTestMode = this.options.blockchainTestMode;</span>
+<span class="cstat-no" title="statement not covered" >    this.blockchainGasFee = this.options.blockchainGasFee;</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >		this.apiKey = this.options.apiKey;</span>
-<span class="cstat-no" title="statement not covered" >		this.channel = this.options.channelId;</span>
-<span class="cstat-no" title="statement not covered" >		this.blockchainTestMode = this.options.blockchainTestMode;</span>
-<span class="cstat-no" title="statement not covered" >		this.blockchainGasFee = this.options.blockchainGasFee;</span>
+<span class="cstat-no" title="statement not covered" >    if (this.blockchainTestMode) {</span>
+<span class="cstat-no" title="statement not covered" >      this.contractAddress = PieMessageAddressDev;</span>
+    } else {
+<span class="cstat-no" title="statement not covered" >      this.contractAddress = PieMessageAddressProd;</span>
+    }
+  }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >		if (this.blockchainTestMode) {</span>
-<span class="cstat-no" title="statement not covered" >			this.contractAddress = PieMessageAddressDev;</span>
-		} else {
-<span class="cstat-no" title="statement not covered" >			this.contractAddress = PieMessageAddressProd;</span>
-		}
-	}
+<span class="fstat-no" title="function not covered" >  as</span>ync init() {
+    const w3 = <span class="cstat-no" title="statement not covered" >new Web3(window.ethereum);</span>
+    const accounts = <span class="cstat-no" title="statement not covered" >await ethereum.request({method: 'eth_requestAccounts'});</span>
+<span class="cstat-no" title="statement not covered" >    this.account = accounts[0];</span>
 &nbsp;
-<span class="fstat-no" title="function not covered" >	as</span>ync init() {
-		const w3 = <span class="cstat-no" title="statement not covered" >new Web3(window.ethereum);</span>
-		const accounts = <span class="cstat-no" title="statement not covered" >await ethereum.request({ method: 'eth_requestAccounts' });</span>
-<span class="cstat-no" title="statement not covered" >		this.account = accounts[0];</span>
+<span class="cstat-no" title="statement not covered" >    this.contract = new w3.eth.Contract(PieMessage.abi, this.contractAddress);</span>
+  }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >		this.contract = new w3.eth.Contract(PieMessage.abi, this.contractAddress);</span>
-	}
+<span class="fstat-no" title="function not covered" >  ch</span>eckWeb3() {
+<span class="cstat-no" title="statement not covered" >    if (typeof Web3 == 'undefined') {</span>
+<span class="cstat-no" title="statement not covered" >      console.error('Web.js is not installed!');</span>
+<span class="cstat-no" title="statement not covered" >      return false;</span>
+    }
 &nbsp;
-<span class="fstat-no" title="function not covered" >	ch</span>eckWeb3() {
-<span class="cstat-no" title="statement not covered" >		if (typeof Web3 == 'undefined') {</span>
-<span class="cstat-no" title="statement not covered" >			console.error('Web.js is not installed!');</span>
-<span class="cstat-no" title="statement not covered" >			return false;</span>
-		}
+<span class="cstat-no" title="statement not covered" >    if (typeof window.ethereum == 'undefined') {</span>
+<span class="cstat-no" title="statement not covered" >      console.error('MetaMask is not installed!');</span>
+<span class="cstat-no" title="statement not covered" >      return false;</span>
+    }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >		if (typeof window.ethereum == 'undefined') {</span>
-<span class="cstat-no" title="statement not covered" >			console.error('MetaMask is not installed!');</span>
-<span class="cstat-no" title="statement not covered" >			return false;</span>
-		}
+<span class="cstat-no" title="statement not covered" >    return true;</span>
+  }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >		return true;</span>
-	}
+<span class="fstat-no" title="function not covered" >  as</span>ync confirm(hash) {
+<span class="cstat-no" title="statement not covered" >    return new Promise(<span class="fstat-no" title="function not covered" >as</span>ync (resolve, reject) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >      if (this.checkWeb3()) {</span>
+<span class="cstat-no" title="statement not covered" >        if (!this.contract) {</span>
+<span class="cstat-no" title="statement not covered" >          await this.init();</span>
+        }
 &nbsp;
-<span class="fstat-no" title="function not covered" >	as</span>ync confirm(hash) {
-<span class="cstat-no" title="statement not covered" >		return new Promise(<span class="fstat-no" title="function not covered" >as</span>ync (resolve, reject) =&gt; {</span>
+        const receipt = <span class="cstat-no" title="statement not covered" >this.contract.methods.confirm(hash).send({from: this.account, gas: this.blockchainGasFee});</span>
+<span class="cstat-no" title="statement not covered" >        receipt.on('transactionHash', resolve);</span>
+<span class="cstat-no" title="statement not covered" >        receipt.on('error', <span class="fstat-no" title="function not covered" >(e</span>rror) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >          reject(error);</span>
+        });
+      }
+    });
+  }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >			if (this.checkWeb3()) {</span>
-<span class="cstat-no" title="statement not covered" >				if (!this.contract) {</span>
-<span class="cstat-no" title="statement not covered" >					await this.init();</span>
-				}
+<span class="fstat-no" title="function not covered" >  as</span>ync send(message) {
+<span class="cstat-no" title="statement not covered" >    return new Promise(<span class="fstat-no" title="function not covered" >as</span>ync (resolve, reject) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >      if (this.checkWeb3()) {</span>
+<span class="cstat-no" title="statement not covered" >        if (!this.contract) {</span>
+<span class="cstat-no" title="statement not covered" >          await this.init();</span>
+        }
 &nbsp;
-				const receipt = <span class="cstat-no" title="statement not covered" >this.contract.methods.confirm(hash).send({ from: this.account, gas: this.blockchainGasFee });</span>
-<span class="cstat-no" title="statement not covered" >				receipt.on('transactionHash', resolve)</span>
-<span class="cstat-no" title="statement not covered" >				receipt.on('error', <span class="fstat-no" title="function not covered" >(e</span>rror) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >					reject(error);</span>
-				});
-			}
+        const bacmHash = <span class="cstat-no" title="statement not covered" >await this.getTransactionHash(message);</span>
 &nbsp;
-		});
-	}
+        const receipt = <span class="cstat-no" title="statement not covered" >this.contract.methods.send(bacmHash.payload).send({from: this.account, gas: this.blockchainGasFee});</span>
+<span class="cstat-no" title="statement not covered" >        receipt.on('transactionHash', <span class="fstat-no" title="function not covered" >(h</span>ash) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >          resolve({</span>
+            hash: hash,
+            id: bacmHash.transaction_id,
+          });
+        });
+<span class="cstat-no" title="statement not covered" >        receipt.on('error', <span class="fstat-no" title="function not covered" >(e</span>rror) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >          reject(error);</span>
+        });
+      } else {
+<span class="cstat-no" title="statement not covered" >        if (typeof Web3 == 'undefined') {</span>
+<span class="cstat-no" title="statement not covered" >          reject('Please install Web3.js');</span>
+        } else {
+<span class="cstat-no" title="statement not covered" >          reject('Please install MetaMask');</span>
+        }
+      }
+    });
+  }
 &nbsp;
-<span class="fstat-no" title="function not covered" >	as</span>ync send(message) {
-<span class="cstat-no" title="statement not covered" >		return new Promise(<span class="fstat-no" title="function not covered" >as</span>ync (resolve, reject) =&gt; {</span>
+<span class="fstat-no" title="function not covered" >  as</span>ync getTransactionHash(message) {
+<span class="cstat-no" title="statement not covered" >    return new Promise(<span class="fstat-no" title="function not covered" >(r</span>esolve, reject) =&gt; {</span>
+      const data = <span class="cstat-no" title="statement not covered" >new FormData();</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >			if (this.checkWeb3()) {</span>
-<span class="cstat-no" title="statement not covered" >				if (!this.contract) {</span>
-<span class="cstat-no" title="statement not covered" >					await this.init();</span>
-				}
+<span class="cstat-no" title="statement not covered" >      data.append('apiKey', this.apiKey);</span>
+<span class="cstat-no" title="statement not covered" >      data.append('channel', this.channel);</span>
+<span class="cstat-no" title="statement not covered" >      data.append('message', JSON.stringify(message));</span>
+<span class="cstat-no" title="statement not covered" >      data.append('contract', this.contractAddress);</span>
 &nbsp;
-				const bacmHash = <span class="cstat-no" title="statement not covered" >await this.getTransactionHash(message);</span>
+      const xhr = <span class="cstat-no" title="statement not covered" >new XMLHttpRequest();</span>
 &nbsp;
-				const receipt = <span class="cstat-no" title="statement not covered" >this.contract.methods.send(bacmHash.payload).send({ from: this.account, gas: this.blockchainGasFee });</span>
-<span class="cstat-no" title="statement not covered" >				receipt.on('transactionHash', <span class="fstat-no" title="function not covered" >(h</span>ash) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >					resolve({</span>
-						hash: hash,
-						id: bacmHash.transaction_id
-					});
-				})
-<span class="cstat-no" title="statement not covered" >				receipt.on('error', <span class="fstat-no" title="function not covered" >(e</span>rror) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >					reject(error);</span>
-				});
+<span class="cstat-no" title="statement not covered" >      xhr.addEventListener('readystatechange', <span class="fstat-no" title="function not covered" >fu</span>nction() {</span>
+<span class="cstat-no" title="statement not covered" >        if (this.readyState === 4) {</span>
+<span class="cstat-no" title="statement not covered" >          try {</span>
+            const response = <span class="cstat-no" title="statement not covered" >JSON.parse(this.responseText);</span>
+<span class="cstat-no" title="statement not covered" >            if (response.errors) {</span>
+<span class="cstat-no" title="statement not covered" >              console.error(`PieSocket Error: ${JSON.stringify(response.errors)}`);</span>
+<span class="cstat-no" title="statement not covered" >              reject();</span>
+            }
 &nbsp;
-			} else {
-<span class="cstat-no" title="statement not covered" >				if (typeof Web3 == 'undefined') {</span>
-<span class="cstat-no" title="statement not covered" >					reject("Please install Web3.js");</span>
-				} else {
-<span class="cstat-no" title="statement not covered" >					reject("Please install MetaMask");</span>
-				}
-			}
-		});
-	}
+<span class="cstat-no" title="statement not covered" >            if (response.success) {</span>
+<span class="cstat-no" title="statement not covered" >              resolve(response.success);</span>
+            } else {
+<span class="cstat-no" title="statement not covered" >              reject('Unknown error');</span>
+            }
+          } catch (e) {
+<span class="cstat-no" title="statement not covered" >            console.error('Could not connect to Blockchain Messaging API, try later');</span>
+<span class="cstat-no" title="statement not covered" >            reject();</span>
+          }
+        }
+      });
 &nbsp;
-<span class="fstat-no" title="function not covered" >	as</span>ync getTransactionHash(message) {
-<span class="cstat-no" title="statement not covered" >		return new Promise(<span class="fstat-no" title="function not covered" >(r</span>esolve, reject) =&gt; {</span>
-			var data = <span class="cstat-no" title="statement not covered" >new FormData();</span>
+<span class="cstat-no" title="statement not covered" >      xhr.addEventListener('error', <span class="fstat-no" title="function not covered" >()</span> =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >        console.error('Blockchain Messaging API seems unreachable at the moment, try later');</span>
+<span class="cstat-no" title="statement not covered" >        reject();</span>
+      });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >			data.append("apiKey", this.apiKey);</span>
-<span class="cstat-no" title="statement not covered" >			data.append("channel", this.channel);</span>
-<span class="cstat-no" title="statement not covered" >			data.append("message", JSON.stringify(message));</span>
-<span class="cstat-no" title="statement not covered" >			data.append("contract", this.contractAddress);</span>
-&nbsp;
-			var xhr = <span class="cstat-no" title="statement not covered" >new XMLHttpRequest();</span>
-&nbsp;
-<span class="cstat-no" title="statement not covered" >			xhr.addEventListener("readystatechange", <span class="fstat-no" title="function not covered" >fu</span>nction () {</span>
-<span class="cstat-no" title="statement not covered" >				if (this.readyState === 4) {</span>
-<span class="cstat-no" title="statement not covered" >					try {</span>
-						const response = <span class="cstat-no" title="statement not covered" >JSON.parse(this.responseText);</span>
-<span class="cstat-no" title="statement not covered" >						if (response.errors) {</span>
-<span class="cstat-no" title="statement not covered" >							console.error(`PieSocket Error: ${JSON.stringify(response.errors)}`);</span>
-<span class="cstat-no" title="statement not covered" >							reject();</span>
-						}
-&nbsp;
-<span class="cstat-no" title="statement not covered" >						if (response.success) {</span>
-<span class="cstat-no" title="statement not covered" >							resolve(response.success);</span>
-						} else {
-<span class="cstat-no" title="statement not covered" >							reject("Unknown error");</span>
-						}
-					} catch (e) {
-<span class="cstat-no" title="statement not covered" >						console.error("Could not connect to Blockchain Messaging API, try later");</span>
-<span class="cstat-no" title="statement not covered" >						reject();</span>
-					}
-				}
-			});
-&nbsp;
-<span class="cstat-no" title="statement not covered" >			xhr.addEventListener('error', <span class="fstat-no" title="function not covered" >()</span> =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >				console.error("Blockchain Messaging API seems unreachable at the moment, try later");</span>
-<span class="cstat-no" title="statement not covered" >				reject();</span>
-			});
-&nbsp;
-<span class="cstat-no" title="statement not covered" >			xhr.open("POST", BCMEndpoint);</span>
-<span class="cstat-no" title="statement not covered" >			xhr.setRequestHeader("Accept", "application/json");</span>
-<span class="cstat-no" title="statement not covered" >			xhr.send(data);</span>
-		});
-	}
-}</pre></td></tr></table></pre>
+<span class="cstat-no" title="statement not covered" >      xhr.open('POST', BCMEndpoint);</span>
+<span class="cstat-no" title="statement not covered" >      xhr.setRequestHeader('Accept', 'application/json');</span>
+<span class="cstat-no" title="statement not covered" >      xhr.send(data);</span>
+    });
+  }
+}
+&nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
             </div><!-- /wrapper -->
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at Sat Jan 15 2022 14:16:34 GMT+0530 (India Standard Time)
+                at Sat Jan 15 2022 15:52:04 GMT+0530 (India Standard Time)
             </div>
         <script src="../prettify.js"></script>
         <script>

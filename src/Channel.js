@@ -1,5 +1,6 @@
 import Logger from './Logger.js';
 import Blockchain from './Blockchain';
+import Socket from './Socket';
 
 export default class Channel {
   constructor(endpoint, identity, init=true) {
@@ -22,7 +23,7 @@ export default class Channel {
   }
 
   connect() {
-    const connection = new WebSocket(this.endpoint);
+    const connection = new Socket(this.endpoint);
     connection.onmessage = this.onMessage.bind(this);
     connection.onopen = this.onOpen.bind(this);
     connection.onerror = this.onError.bind(this);

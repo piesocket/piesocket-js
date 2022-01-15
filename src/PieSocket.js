@@ -13,8 +13,8 @@ export default class PieSocket {
     this.logger = new Logger(this.options);
   }
 
-  subscribe(channelId) {
-    const makeEndpoint = this.getEndpoint(channelId);
+  async subscribe(channelId) {
+    const endpoint = await this.getEndpoint(channelId);
 
     if (this.connections[channelId]) {
       this.logger.log('Returning existing channel', channelId);
@@ -22,13 +22,9 @@ export default class PieSocket {
     }
 
     this.logger.log('Creating new channel', channelId);
-    const channel = new Channel(null, null, false);
-
-    makeEndpoint.then((endpoint)=>{
-      channel.init(endpoint, {
+    const channel = new Channel(endpoint, {
         channelId: channelId,
         ...this.options,
-      });
     });
 
     this.connections[channelId] = channel;

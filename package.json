@@ -7,7 +7,7 @@
     "scripts": {
         "test": "jest",
         "coverage": "jest --coverage",
-        "lint": "eslint src",
+        "lint": "eslint src --fix",
         "start": "NODE_ENV=development webpack serve --mode=development --config webpack.dev.js ",
         "build": "webpack --mode=production --config webpack.prod.js",
         "prepare": "npm run build",
