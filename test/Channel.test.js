@@ -16,10 +16,20 @@ const mockBlockchainSend = jest.fn().mockImplementation((data) => {
         hash: "0x000000000000000000"
     })
 });
+const mockBlockchainConfirm = jest.fn().mockImplementation((data) => {
+    if(data.name == "Testfail"){
+        return Promise.reject();
+    }
+
+    return Promise.resolve({
+        hash: "0x000000000000000000"
+    })
+});
 jest.mock('../src/Blockchain.js', () => {
   return jest.fn().mockImplementation(() => {
     return {
-        send: mockBlockchainSend
+        send: mockBlockchainSend,
+        confirm: mockBlockchainConfirm
     };  
   });
 });
@@ -113,7 +123,8 @@ describe('Channel', function () {
 
   it('#sendOnBlockchain() -  Registers a event on blockchain and then broadcasts the payload to peers', done =>{
     const blockChainHashCallback = jest.fn();
-    const blockChainErrorCallback = jest.fn().mockImplementation(()=> { return "ok"; });
+    const blockChainErrorCallback = jest.fn();
+
     channel.on('blockchain-hash', blockChainHashCallback);
     channel.on('blockchain-error', blockChainErrorCallback);
 
@@ -141,7 +152,8 @@ describe('Channel', function () {
 
   it('#sendOnBlockchain() -  Triggers blockchain-error when error occurs', done =>{
     const blockChainHashCallback = jest.fn();
-    const blockChainErrorCallback = jest.fn().mockImplementation(()=> { return "ok"; });
+    const blockChainErrorCallback = jest.fn();
+    
     channel.on('blockchain-hash', blockChainHashCallback);
     channel.on('blockchain-error', blockChainErrorCallback);
 
@@ -152,6 +164,100 @@ describe('Channel', function () {
         expect(blockChainHashCallback).not.toBeCalled();
         done();
     });
+  });
+
+  it('#confirmOnBlockchain() -  Confirms as blockchain message witness', done =>{
+    const blockChainHashCallback = jest.fn();
+    const blockChainErrorCallback = jest.fn();
+
+    channel.on('blockchain-hash', blockChainHashCallback);
+    channel.on('blockchain-error', blockChainErrorCallback);
+
+    channel.confirmOnBlockchain('blockchain-event2', {
+        "name": "Tom Doe"
+    }, { "foo": "bar" }).then(()=>{
+        expect(blockChainErrorCallback).not.toBeCalled();
+        expect(mockWebSocketSend).toHaveBeenCalledTimes(4);
+        expect(blockChainHashCallback).toBeCalled();
+        done();
+    });
+  });
+
+  it('#confirmOnBlockchain() - Triggers blockchain-error when something goes wrong', done =>{
+    const blockChainHashCallback = jest.fn();
+    const blockChainErrorCallback = jest.fn();
+
+    channel.on('blockchain-hash', blockChainHashCallback);
+    channel.on('blockchain-error', blockChainErrorCallback);
+
+    channel.confirmOnBlockchain('blockchain-event2', {
+        "name": "Testfail"
+    }, { "foo": "bar" }).then(()=>{
+        expect(blockChainErrorCallback).toBeCalled();
+        expect(blockChainHashCallback).not.toBeCalled();
+        done();
+    });
+  });
+
+  it("#onMessage() - Fires event listeners", () => {
+    const testEventListener = jest.fn();
+    const testEventListenerAll = jest.fn();
+    const testEventListenerMessage = jest.fn();
+    channel.listen("test-onmessage-event", testEventListener);
+    channel.listen("*", testEventListenerAll);
+    channel.on("message", testEventListenerMessage);
+    const evt = {
+        data: JSON.stringify({
+            event: "test-onmessage-event",
+            data: {
+                "name": "Harry Doe"
+            },
+            meta: { "foo": "bar" }
+        })
+    };
+    channel.onMessage(evt);
+
+    expect(testEventListener).toHaveBeenCalledWith({
+        "name": "Harry Doe"
+    }, { "foo": "bar" });
+    expect(testEventListenerAll).toHaveBeenCalledWith("test-onmessage-event",{
+        "name": "Harry Doe"
+    }, { "foo": "bar" });
+    expect(testEventListenerMessage).toHaveBeenCalledWith(evt);
+
+  });
+
+  it("#onOpen() - Fires event listeners", () => {
+    const testEventListener = jest.fn();
+    channel.on("open", testEventListener);
+    channel.onOpen({"foo":"bar"});
+
+    expect(testEventListener).toHaveBeenCalledWith({ "foo": "bar" });
+  });
+
+  it("#onError() - Fires event listeners", () => {
+    const testEventListener = jest.fn();
+    channel.on("error", testEventListener);
+    channel.onError({"foo":"error"});
+
+    expect(testEventListener).toHaveBeenCalledWith({ "foo": "error" });
+  });
+
+  it("#onError() - Fires event listeners", () => {
+    const testEventListener = jest.fn();
+    channel.on("close", testEventListener);
+    channel.onClose({"foo":"close"});
+
+    expect(testEventListener).toHaveBeenCalledWith({ "foo": "close" });
+  });
+
+  it("#reConnect() - Reconnects websocket connection", () => {
+    const testEventListener = jest.fn();
+
+    channel.shouldReconnect = true;
+    const connectSpy = jest.spyOn(channel, 'connect');
+    channel.reconnect();
+    expect(connectSpy).toHaveBeenCalled()
   });
 
 });

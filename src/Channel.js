@@ -84,27 +84,28 @@ export default class Channel {
     };
   }
 
-  confirmOnBlockchain(event, transactionHash) {
+  async confirmOnBlockchain(event, transactionHash) {
     if (!this.blockchain) {
       this.blockchain = new Blockchain(this.identity);
     }
 
-    this.blockchain.confirm(transactionHash)
-        .then((hash) => {
-          if (this.events['blockchain-hash']) {
-            this.events['blockchain-hash'].bind(this)({
-              event: event,
-              confirmationHash: transactionHash,
-              transactionHash: hash,
-            });
-          }
-          return this.connection.send(JSON.stringify({'event': event, 'data': transactionHash, 'meta': {'transaction_id': 1, 'transaction_hash': hash}}));
-        })
-        .catch((e) => {
-          if (this.events['blockchain-error']) {
-            this.events['blockchain-error'].bind(this)(e);
-          }
+    try{  
+      const hash = await this.blockchain.confirm(transactionHash);
+
+      if (this.events['blockchain-hash']) {
+        this.events['blockchain-hash'].bind(this)({
+          event: event,
+          confirmationHash: transactionHash,
+          transactionHash: hash,
         });
+      }
+
+      return this.connection.send(JSON.stringify({'event': event, 'data': transactionHash, 'meta': {'transaction_id': 1, 'transaction_hash': hash}}));
+    }catch(e){
+      if (this.events['blockchain-error']) {
+        this.events['blockchain-error'].bind(this)(e);
+      }
+    }
   }
 
   onMessage(e) {

@@ -29,12 +29,12 @@ export default class Blockchain {
 
   checkWeb3() {
     if (typeof Web3 == 'undefined') {
-      console.error('Web.js is not installed!');
+      console.log('Web.js is not installed!');
       return false;
     }
 
     if (typeof window.ethereum == 'undefined') {
-      console.error('MetaMask is not installed!');
+      console.log('MetaMask is not installed!');
       return false;
     }
 
