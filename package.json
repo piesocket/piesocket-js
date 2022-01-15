@@ -7,6 +7,7 @@
     "scripts": {
         "test": "jest",
         "coverage": "jest --coverage",
+        "lint": "eslint src",
         "start": "NODE_ENV=development webpack serve --mode=development --config webpack.dev.js ",
         "build": "webpack --mode=production --config webpack.prod.js",
         "prepare": "npm run build",
@@ -37,6 +38,8 @@
         "@babel/register": "^7.16.9",
         "@webpack-cli/serve": "^1.1.0",
         "babel-jest": "^27.4.6",
+        "eslint": "^8.6.0",
+        "eslint-config-google": "^0.14.0",
         "webpack": "^5.9.0",
         "webpack-cli": "^4.2.0",
         "webpack-dev-server": "^3.11.2",

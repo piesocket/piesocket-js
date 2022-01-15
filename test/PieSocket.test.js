@@ -6,7 +6,7 @@ import DefaultOptions from '../src/misc/DefaultOptions';
 var assert = require('assert');
 
 describe('PieSocket', function() {
-  
+
   describe('#constructor()', function() {
 
     it('Test default options', function() {
