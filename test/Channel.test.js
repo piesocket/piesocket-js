@@ -2,9 +2,30 @@ import '@babel/polyfill';
 import Channel from '../src/Channel';
 import PieSocket from '../src/PieSocket';
 import Logger from '../src/Logger';
+import Blockchain from '../src/Blockchain';
 
 const assert = require('assert');
 
+//Blockchain Mock
+const mockBlockchainSend = jest.fn().mockImplementation((data) => {
+    if(data.name == "Testfail"){
+        return Promise.reject();
+    }
+
+    return Promise.resolve({
+        hash: "0x000000000000000000"
+    })
+});
+jest.mock('../src/Blockchain.js', () => {
+  return jest.fn().mockImplementation(() => {
+    return {
+        send: mockBlockchainSend
+    };  
+  });
+});
+
+
+//Socket Mock
 const mockWebSocketClose = jest.fn();
 const mockWebSocketSend = jest.fn();
 jest.mock('../src/Socket.js', () => {
@@ -77,11 +98,12 @@ describe('Channel', function () {
   })
 
   it('#publish() - Sends formatted event on websocket connection', function () {
-    channel.publish('testevent', {
+    channel.publish('test-event', {
         "name": "John Doe"
     }, { "foo": "bar" });
+
     expect(mockWebSocketSend).toHaveBeenCalledWith(JSON.stringify({
-        event: "testevent",
+        event: "test-event",
         data: {
             "name": "John Doe"
         },
@@ -89,5 +111,47 @@ describe('Channel', function () {
     }));
   });
 
+  it('#sendOnBlockchain() -  Registers a event on blockchain and then broadcasts the payload to peers', done =>{
+    const blockChainHashCallback = jest.fn();
+    const blockChainErrorCallback = jest.fn().mockImplementation(()=> { return "ok"; });
+    channel.on('blockchain-hash', blockChainHashCallback);
+    channel.on('blockchain-error', blockChainErrorCallback);
+
+    channel.sendOnBlockchain('blockchain-event', {
+        "name": "Harry Doe"
+    }, { "foo": "bar" }).then(()=>{
+
+        expect(mockBlockchainSend).toHaveBeenCalledWith({
+            "name": "Harry Doe"
+        });
+        expect(blockChainErrorCallback).not.toBeCalled();
+        expect(blockChainHashCallback).toBeCalled();
+        expect(mockWebSocketSend).toHaveBeenCalledWith(JSON.stringify({
+            event: "blockchain-event",
+            data: {
+                "name": "Harry Doe"
+            },
+            meta: { "foo": "bar", "transaction_hash":"0x000000000000000000" }
+        }));
+        done();
+    });
+
+
+  });
+
+  it('#sendOnBlockchain() -  Triggers blockchain-error when error occurs', done =>{
+    const blockChainHashCallback = jest.fn();
+    const blockChainErrorCallback = jest.fn().mockImplementation(()=> { return "ok"; });
+    channel.on('blockchain-hash', blockChainHashCallback);
+    channel.on('blockchain-error', blockChainErrorCallback);
+
+    channel.sendOnBlockchain('blockchain-event', {
+        "name": "Testfail"
+    }, { "foo": "bar" }).then(()=>{
+        expect(blockChainErrorCallback).toBeCalled();
+        expect(blockChainHashCallback).not.toBeCalled();
+        done();
+    });
+  });
 
 });

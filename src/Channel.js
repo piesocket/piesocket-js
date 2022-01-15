@@ -47,9 +47,9 @@ export default class Channel {
     return this.connection.send(data);
   }
 
-  publish(event, data, meta) {
+  async publish(event, data, meta) {
     if (meta && meta.blockchain) {
-      return this.sendOnBlockchain(event, data, meta);
+      return await this.sendOnBlockchain(event, data, meta);
     }
     return this.connection.send(JSON.stringify({
       event: event,
@@ -59,27 +59,29 @@ export default class Channel {
   }
 
 
-  sendOnBlockchain(event, data, meta) {
+  async sendOnBlockchain(event, data, meta) {
     if (!this.blockchain) {
       this.blockchain = new Blockchain(this.identity);
     }
-    this.blockchain.send(data)
-        .then((receipt) => {
-          if (this.events['blockchain-hash']) {
-            this.events['blockchain-hash'].bind(this)({
-              event: event,
-              data: data,
-              meta: meta,
-              transactionHash: receipt.hash,
-            });
-          }
-          return this.connection.send(JSON.stringify({'event': event, 'data': data, 'meta': {...meta, 'transaction_id': receipt.id, 'transaction_hash': receipt.hash}}));
-        })
-        .catch((e) => {
-          if (this.events['blockchain-error']) {
-            this.events['blockchain-error'].bind(this)(e);
-          }
+
+    try{
+      const receipt = await this.blockchain.send(data);
+
+      if (this.events['blockchain-hash']) {
+        this.events['blockchain-hash'].bind(this)({
+          event: event,
+          data: data,
+          meta: meta,
+          transactionHash: receipt.hash,
         });
+      }
+
+      return this.connection.send(JSON.stringify({'event': event, 'data': data, 'meta': {...meta, 'transaction_id': receipt.id, 'transaction_hash': receipt.hash}}));
+    }catch(e){
+      if (this.events['blockchain-error']) {  
+        this.events['blockchain-error'].bind(this)(e);
+      }
+    };
   }
 
   confirmOnBlockchain(event, transactionHash) {
