@@ -6,6 +6,11 @@ export default class Channel {
   constructor(endpoint, identity, init=true) {
     this.events = {};
     this.listeners = {};
+    this.members = [];
+    this.video = null;
+    this.uuid = null;
+    this.onSocketConnected = () => {};
+    this.onSocketError = () => {};
 
     if (!init) {
       return;
@@ -22,12 +27,35 @@ export default class Channel {
     this.logger = new Logger(identity);
   }
 
+  getMemberByUUID(uuid){
+    let member = null;
+    for(var i = 0; i < this.members.length; i++){
+      if(this.members[i].uuid == uuid){
+        member = this.members[i];
+        break;
+      }
+    }
+    return member;
+  }
+
+  getCurrentMember(){
+    return this.getMemberByUUID(this.uuid);
+  }
+
   connect() {
     const connection = new Socket(this.endpoint);
     connection.onmessage = this.onMessage.bind(this);
     connection.onopen = this.onOpen.bind(this);
     connection.onerror = this.onError.bind(this);
     connection.onclose = this.onClose.bind(this);
+
+    if(this.identity.onSocketConnected){
+      this.onSocketConnected = this.identity.onSocketConnected;
+    }
+
+    if(this.identity.onSocketError){
+      this.onSocketError = this.identity.onSocketError;
+    }
 
     return connection;
   }
@@ -41,7 +69,7 @@ export default class Channel {
     // Register user defined callbacks
     this.listeners[event] = callback;
   }
-
+ 
 
   send(data) {
     return this.connection.send(data);
@@ -119,6 +147,8 @@ export default class Channel {
 
       // Fire event listeners
       if (message.event) {
+        this.handleMemberHandshake(message);
+
         if (this.listeners[message.event]) {
           this.listeners[message.event].bind(this)(message.data, message.meta);
         }
@@ -137,19 +167,44 @@ export default class Channel {
     }
   }
 
+  handleMemberHandshake(message){
+    if(message.event == "system:member_list"){
+      this.members = message.data.members;
+    }
+    else if(message.event == "system:member_joined"){
+      this.members = message.data.members;
+    }
+    else if(message.event == "system:member_left"){
+      this.members = message.data.members;
+      if(this.video){
+        this.video.removeParticipant(message.data.member.uuid);
+      }
+    }
+    else if(message.event == "system:video_request" && message.data.from != this.uuid){
+      this.video.shareVideo(message.data);
+    }
+    else if(message.event == "system:video_accept" && message.data.to == this.uuid){
+      this.video.addIceCandidate(message.data);
+    }
+    else if(message.event == "system:video_offer" && message.data.to == this.uuid){
+      this.video.createAnswer(message.data);
+    }
+  }
+
   onOpen(e) {
     this.logger.log('Channel connected:', e);
     this.shouldReconnect = true;
 
-    // User defined callback
-    if (this.events['open']) {
-      this.events['open'].bind(this)(e);
-    }
+    //System init callback
+    this.onSocketConnected(e);
   }
 
   onError(e) {
     this.logger.error('Channel error:', e);
     this.connection.close();
+
+    //System init error callback
+    this.onSocketError(e);
 
     // User defined callback
     if (this.events['error']) {
