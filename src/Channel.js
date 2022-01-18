@@ -7,7 +7,7 @@ export default class Channel {
     this.events = {};
     this.listeners = {};
     this.members = [];
-    this.video = null;
+    this.portal = null;
     this.uuid = null;
     this.onSocketConnected = () => {};
     this.onSocketError = () => {};
@@ -176,18 +176,18 @@ export default class Channel {
     }
     else if(message.event == "system:member_left"){
       this.members = message.data.members;
-      if(this.video){
-        this.video.removeParticipant(message.data.member.uuid);
+      if(this.portal){
+        this.portal.removeParticipant(message.data.member.uuid);
       }
     }
     else if(message.event == "system:video_request" && message.data.from != this.uuid){
-      this.video.shareVideo(message.data);
+      this.portal.shareVideo(message.data);
     }
     else if(message.event == "system:video_accept" && message.data.to == this.uuid){
-      this.video.addIceCandidate(message.data);
+      this.portal.addIceCandidate(message.data);
     }
     else if(message.event == "system:video_offer" && message.data.to == this.uuid){
-      this.video.createAnswer(message.data);
+      this.portal.createAnswer(message.data);
     }
   }
 

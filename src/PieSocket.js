@@ -1,6 +1,6 @@
 import Channel from './Channel.js';
 import Logger from './Logger.js';
-import Video from './Video';
+import Portal from './Portal';
 import pjson from '../package.json';
 import InvalidAuthException from './InvalidAuthException.js';
 import defaultOptions from './misc/DefaultOptions.js';
@@ -11,7 +11,6 @@ export default class PieSocket {
     options = options || {};
 
     this.options = {...defaultOptions, ...options};
-    this.video = null;
     this.connections = {};
     this.logger = new Logger(this.options);
   }
@@ -37,7 +36,7 @@ export default class PieSocket {
                 onSocketConnected: () => {
                     channel.uuid = uuid; 
                     if(roomOptions.video){
-                        channel.video =  new Video(channel, {
+                        channel.portal =  new Portal(channel, {
                             ...this.options,
                             ...roomOptions
                         });

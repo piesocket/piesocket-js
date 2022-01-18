@@ -1,6 +1,6 @@
 import Logger from './Logger.js';
 
-export default class Video {
+export default class Portal {
     
     /**
      * Creates a video room instance
