@@ -49,7 +49,13 @@ export default class PieSocket {
                 },
                 ...this.options,
             });
-        
+
+            if(typeof WebSocket == "undefined"){
+                //Resolves the promise in case WebSocket is not defined
+                channel.uuid = uuid; 
+                this.connections[channelId] = channel;    
+                resolve(channel);
+            }
         }
     });
   }

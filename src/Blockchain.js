@@ -29,7 +29,7 @@ export default class Blockchain {
 
   checkWeb3() {
     if (typeof Web3 == 'undefined') {
-      console.log('Web.js is not installed!');
+      console.log('Web3.js is not installed!');
       return false;
     }
 

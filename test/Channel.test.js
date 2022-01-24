@@ -6,7 +6,42 @@ import Blockchain from '../src/Blockchain';
 
 const assert = require('assert');
 
-//Blockchain Mock
+//Mock
+const mockAddIceCandidate = jest.fn();
+const mockCreateAnswer = jest.fn().mockImplementation(()=> {
+    return Promise.resolve();
+});
+const mockSetLocalDescription = jest.fn().mockImplementation(()=> {
+    return Promise.resolve();
+});
+const mockSetRemoteDescription = jest.fn().mockImplementation(()=> {
+    return Promise.resolve();
+});
+jest.mock('../src/misc/RTCPeerConnection.js', () => {
+  return jest.fn().mockImplementation(() => {
+    return {
+        addIceCandidate: mockAddIceCandidate,
+        setRemoteDescription: mockSetRemoteDescription,
+        createAnswer: mockCreateAnswer,
+        setLocalDescription: mockSetLocalDescription
+    };
+  });
+});
+
+jest.mock('../src/misc/RTCSessionDescription.js', () => {
+  return jest.fn().mockImplementation(() => {
+    return {
+    };
+  });
+});
+
+jest.mock('../src/misc/RTCIceCandidate.js', () => {
+  return jest.fn().mockImplementation(() => {
+    return {
+    };
+  });
+});
+
 const mockBlockchainSend = jest.fn().mockImplementation((data) => {
     if(data.name == "Testfail"){
         return Promise.reject();
@@ -27,7 +62,6 @@ const mockBlockchainConfirm = jest.fn().mockImplementation((data) => {
     })
 });
 
-//Blockchain Mock
 jest.mock('../src/Blockchain.js', () => {
   return jest.fn().mockImplementation(() => {
     return {
@@ -38,7 +72,6 @@ jest.mock('../src/Blockchain.js', () => {
 });
 
 
-//Socket Mock
 const mockWebSocketClose = jest.fn();
 const mockWebSocketSend = jest.fn();
 jest.mock('../src/misc/WebSocket.js', () => {
@@ -50,8 +83,8 @@ jest.mock('../src/misc/WebSocket.js', () => {
   });
 });
 
-const channelProperties = ['events', 'listeners','endpoint', 'identity', 'connection', 'shouldReconnect', 'logger'];
-const uninitializedChannelProperties = ['events', 'listeners'];
+const channelProperties = ['events', 'listeners', 'members', 'portal', 'uuid', 'onSocketConnected', 'onSocketError', 'endpoint', 'identity', 'connection', 'shouldReconnect', 'logger'];
+const uninitializedChannelProperties = ['events', 'listeners', 'members', 'portal', 'uuid', 'onSocketConnected', 'onSocketError'];
 
 describe('Channel', function () {
 
@@ -81,7 +114,7 @@ describe('Channel', function () {
     uninitializedChannel.init(piesocket.getEndpoint("test"), piesocket.options);
     
     const propsAfterInit = Object.keys(uninitializedChannel);
-    propsAfterInit.splice(2,1); //remove connect property added by spy
+    propsAfterInit.splice(7,1); //remove connect property added by spy
     expect(propsAfterInit).toEqual(channelProperties);
 
     expect(connectSpy).toHaveBeenCalled()
@@ -232,7 +265,7 @@ describe('Channel', function () {
 
   it("#onOpen() - Fires event listeners", () => {
     const testEventListener = jest.fn();
-    channel.on("open", testEventListener);
+    channel.onSocketConnected = testEventListener;
     channel.onOpen({"foo":"bar"});
 
     expect(testEventListener).toHaveBeenCalledWith({ "foo": "bar" });
