@@ -1,4 +1,7 @@
 import Logger from './Logger.js';
+import IceCandidate from './misc/RTCIceCandidate';
+import PeerConnection from './misc/RTCPeerConnection';
+import SessionDescription from './misc/RTCSessionDescription';
 
 export default class Portal {
     
@@ -34,16 +37,18 @@ export default class Portal {
      * Initialize local video
      */
     init(){ 
-        if(navigator.mediaDevices.getUserMedia) {
+        if(typeof navigator!="undefined" && navigator.mediaDevices.getUserMedia) {
 			navigator.mediaDevices.getUserMedia(this.constraints).then(this.getUserMediaSuccess.bind(this)).catch(this.errorHandler);
+            return true;
 		} else {
-			alert('Your browser does not support getUserMedia API');
+			this.logger.error('Your browser does not support getUserMedia API');
+            return false;
 		}
     }
 
     shareVideo(signal, isCaller=true){
 
-        const rtcConnection = new RTCPeerConnection(this.peerConnectionConfig);
+        const rtcConnection = new PeerConnection(this.peerConnectionConfig);
 
         rtcConnection.onicecandidate = (event) => {
             if(event.candidate != null) {    
@@ -118,37 +123,36 @@ export default class Portal {
 
     addIceCandidate(signal){
         const rtcConnection =  this.participants[signal.from].rtc;
-        rtcConnection.addIceCandidate(new RTCIceCandidate(signal.ice)).catch(this.errorHandler);
+        rtcConnection.addIceCandidate(new IceCandidate(signal.ice));
     }
 
     createAnswer(signal){
-        if(!this.participants[signal.from] || !this.participants[signal.from].rtc) {
-            console.log("Starting call in createAnswer")
-            this.shareVideo(signal, false);
-        }
-        
-        this.participants[signal.from].rtc.setRemoteDescription(new RTCSessionDescription(signal.sdp)).then(function() {
+        return new Promise(async (resolve, reject)=> {
+
+            if(!this.participants[signal.from] || !this.participants[signal.from].rtc) {
+                console.log("Starting call in createAnswer")
+                this.shareVideo(signal, false);
+            }
+    
+            await this.participants[signal.from].rtc.setRemoteDescription(new SessionDescription(signal.sdp));
             // Only create answers in response to offers
             if(signal.sdp.type == 'offer') {
-              
-              console.log("Got an offer from "+signal.from,signal)
 
-              this.participants[signal.from].rtc.createAnswer().then((description) => {
-                    //The remove description  		
-                    this.participants[signal.from].rtc.setLocalDescription(description).then(function() {
-                      this.channel.publish("system:video_offer", {
-                        'from' : this.channel.uuid,
-                        'to' : signal.from,
-                        'sdp': this.participants[signal.from].rtc.localDescription
-                      });						
-                  }.bind(this)).catch(this.errorHandler);
+                this.logger.log("Got an offer from "+signal.from,signal);
+                const description = await this.participants[signal.from].rtc.createAnswer();
 
-                }).catch(this.errorHandler);
+                await this.participants[signal.from].rtc.setLocalDescription(description);
+                this.channel.publish("system:video_offer", {
+                    'from' : this.channel.uuid,
+                    'to' : signal.from,
+                    'sdp': this.participants[signal.from].rtc.localDescription
+                });			
+                resolve();			
             }else{
-              console.log("Got an asnwer from "+signal.from);		
+                this.logger.log("Got an asnwer from "+signal.from);		
+                resolve();			
             }
-            
-        }.bind(this)).catch(this.errorHandler);
+        });        
     }
 
     /**
@@ -168,7 +172,7 @@ export default class Portal {
 
     
     errorHandler(e){
-        console.error("Error",e);
+        this.logger.error("Portal error", e);
     }
 
 }

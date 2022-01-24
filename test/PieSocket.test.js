@@ -2,13 +2,49 @@ import '@babel/polyfill';
 import PieSocket from '../src/PieSocket';
 import Logger from '../src/Logger';
 import DefaultOptions from '../src/misc/DefaultOptions';
-import Socket from '../src/Socket';
+import Socket from '../src/misc/WebSocket';
 
 const pieSocketProperties = ['options', 'connections', 'logger'];
 const channelProperties = ['events', 'listeners', 'endpoint', 'identity', 'connection', 'shouldReconnect', 'logger'];
 
+//Mocks
+const mockAddIceCandidate = jest.fn();
+const mockCreateAnswer = jest.fn().mockImplementation(()=> {
+    return Promise.resolve();
+});
+const mockSetLocalDescription = jest.fn().mockImplementation(()=> {
+    return Promise.resolve();
+});
+const mockSetRemoteDescription = jest.fn().mockImplementation(()=> {
+    return Promise.resolve();
+});
+jest.mock('../src/misc/RTCPeerConnection.js', () => {
+  return jest.fn().mockImplementation(() => {
+    return {
+        addIceCandidate: mockAddIceCandidate,
+        setRemoteDescription: mockSetRemoteDescription,
+        createAnswer: mockCreateAnswer,
+        setLocalDescription: mockSetLocalDescription
+    };
+  });
+});
+
+jest.mock('../src/misc/RTCSessionDescription.js', () => {
+  return jest.fn().mockImplementation(() => {
+    return {
+    };
+  });
+});
+
+jest.mock('../src/misc/RTCIceCandidate.js', () => {
+  return jest.fn().mockImplementation(() => {
+    return {
+    };
+  });
+});
+
 const mockWebSocketClose = jest.fn();
-jest.mock('../src/Socket.js', () => {
+jest.mock('../src/misc/WebSocket.js', () => {
   return jest.fn().mockImplementation(() => {
     return {
       close: mockWebSocketClose
@@ -18,6 +54,7 @@ jest.mock('../src/Socket.js', () => {
 
 var assert = require('assert');
 
+//Tests
 describe('PieSocket', function () {
 
   describe('#constructor()', function () {
@@ -54,6 +91,8 @@ describe('PieSocket', function () {
 
       function subscribeCallback(_channel) {
         channel = _channel;
+        done();
+
         expect(Socket).toHaveBeenCalledWith('wss://nyc1.piesocket.com/v3/test-channel?api_key=xxx&notify_self=0&source=jssdk&v=1.4.0&presence=0');
         assert.deepEqual(channel.identity, { ...piesocket.options, channelId: 'test-channel' });
         assert.deepEqual(channel.events, {});

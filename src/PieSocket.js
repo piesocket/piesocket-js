@@ -39,7 +39,7 @@ export default class PieSocket {
                         channel.portal =  new Portal(channel, {
                             ...this.options,
                             ...roomOptions
-                        });
+                        });``
                     }
                     this.connections[channelId] = channel;    
                     resolve(channel);    

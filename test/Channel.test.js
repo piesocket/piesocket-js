@@ -16,6 +16,7 @@ const mockBlockchainSend = jest.fn().mockImplementation((data) => {
         hash: "0x000000000000000000"
     })
 });
+
 const mockBlockchainConfirm = jest.fn().mockImplementation((data) => {
     if(data.name == "Testfail"){
         return Promise.reject();
@@ -25,6 +26,8 @@ const mockBlockchainConfirm = jest.fn().mockImplementation((data) => {
         hash: "0x000000000000000000"
     })
 });
+
+//Blockchain Mock
 jest.mock('../src/Blockchain.js', () => {
   return jest.fn().mockImplementation(() => {
     return {
@@ -38,7 +41,7 @@ jest.mock('../src/Blockchain.js', () => {
 //Socket Mock
 const mockWebSocketClose = jest.fn();
 const mockWebSocketSend = jest.fn();
-jest.mock('../src/Socket.js', () => {
+jest.mock('../src/misc/WebSocket.js', () => {
   return jest.fn().mockImplementation(() => {
     return {
       close: mockWebSocketClose,
