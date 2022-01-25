@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PieSocket Javascript Client</title>
+    <title>PieSocket WebSocket Client</title>
 
     <!-- UIkit CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.5.10/dist/css/uikit.min.css" />
@@ -83,23 +83,25 @@
 
 
             //Subscribe to a channel
-            window.channel = piesocket.subscribe(channelId);
+            piesocket.subscribe(channelId).then(ch => {
+                window.channel = ch;
 
-            //Update connections list
-            updateConnectionList();
+                //Update connections list
+                updateConnectionList();
 
-            //Register event callbacks
-            channel.on('open', function() {
-                logArea.append(`- Subscribed successfully to the channel: ${channelId} \n`);
-                logArea.innerHTML = logArea.innerHTML + `- You can now see messages sent to this channel from <a target="_blank" href="https://www.piesocket.com/websocket-tester">https://www.piesocket.com/websocket-tester</a> or your server.\n`; 
-            });
+                //Register event callbacks
+                channel.on('open', function() {
+                    logArea.append(`- Subscribed successfully to the channel: ${channelId} \n`);
+                    logArea.innerHTML = logArea.innerHTML + `- You can now see messages sent to this channel from <a target="_blank" href="https://www.piesocket.com/websocket-tester">https://www.piesocket.com/websocket-tester</a> or your server.\n`; 
+                });
 
-            channel.on('message',function(e) { 
-                logArea.append(`- New message on channel ${this.identity.channelId} : ${e.data} \n`); 
-            }); 
+                channel.on('message',function(e) { 
+                    logArea.append(`- New message on channel ${this.identity.channelId} : ${e.data} \n`); 
+                }); 
 
-            channel.on('close', function(e) {
-                 logArea.append(`- Channel ${this.identity.channelId} closed \n`); 
+                channel.on('close', function(e) {
+                    logArea.append(`- Channel ${this.identity.channelId} closed \n`); 
+                });
             }); 
         });
 

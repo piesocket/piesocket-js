@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PieSocket WebRTC Client</title>
+
+    <!-- UIkit CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.5.10/dist/css/uikit.min.css" />
+</head>
+<body>
+
+    <div>
+        <video id="local-video" autoplay></video>
+    </div>
+    <div id="participants">
+    </div>
+
+    
+    <script src="/dist/piesocket.js"></script>
+    <script>
+
+        //Initiate PieSocket
+        var piesocket = new PieSocket({
+            clusterId: 's3419.sgp1',
+            apiKey: '8WTWMYT5piRV0Dn19iLAIRazwG5PNsuiyHwNZNkY',
+            consoleLogs: false,
+            jwt:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJwcmVzZW5jZS12aWRlby1yb29tIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJ1c2VyIjp7Im5hbWUiOiJBbmFuZCJ9fQ.9hwl5ElPTqLeYp1gZBQmSxx_xNi48BskOfPYLAM6eUs"
+        });
+
+        piesocket.subscribe("presence-video-room",{
+            video: true,
+            onLocalVideo: (stream, video) => {
+                console.log("Got local video", stream, video);
+                var localVideo = document.getElementById("local-video");
+                localVideo.srcObject = stream;
+            },
+            onParticipantJoined: (uuid, stream) => {
+                console.log("New participant joined")
+                var videoHolder = document.createElement("video");  
+                videoHolder.setAttribute("autoplay", true);
+                videoHolder.srcObject = stream;
+                videoHolder.id = uuid;
+                document.getElementById("participants").append(videoHolder);
+            },
+            onParticipantLeft: (uuid) => {
+                console.log("MEMBER LEFT", uuid);
+                document.getElementById(uuid).remove();
+            }
+        }).then((channel)=>{
+            //Channel connection ready
+            console.log("PieSocket channel connected");
+
+            channel.listen("system:member_list", (members)=> {
+                console.log("Fetched members list", channel.members);
+            })
+
+            channel.listen("system:member_joined", (member)=> {
+                console.log("New member joined", channel.members);
+            })
+
+            channel.listen("system:video_request", (data)=> {
+                console.log("New video request", data, channel.members);
+            })            
+
+            channel.listen("system:member_left", (data)=> {
+                console.log("New member left", data.member, data.members);
+            })
+        });
+              
+    </script>
+</body>
+</html>
