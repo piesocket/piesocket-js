@@ -27,10 +27,10 @@ export default class Channel {
     this.logger = new Logger(identity);
   }
 
-  getMemberByUUID(uuid){
+  getMemberByUUID(uuid) {
     let member = null;
-    for(var i = 0; i < this.members.length; i++){
-      if(this.members[i].uuid == uuid){
+    for (let i = 0; i < this.members.length; i++) {
+      if (this.members[i].uuid == uuid) {
         member = this.members[i];
         break;
       }
@@ -38,7 +38,7 @@ export default class Channel {
     return member;
   }
 
-  getCurrentMember(){
+  getCurrentMember() {
     return this.getMemberByUUID(this.uuid);
   }
 
@@ -49,11 +49,11 @@ export default class Channel {
     connection.onerror = this.onError.bind(this);
     connection.onclose = this.onClose.bind(this);
 
-    if(this.identity.onSocketConnected){
+    if (this.identity.onSocketConnected) {
       this.onSocketConnected = this.identity.onSocketConnected;
     }
 
-    if(this.identity.onSocketError){
+    if (this.identity.onSocketError) {
       this.onSocketError = this.identity.onSocketError;
     }
 
@@ -69,7 +69,7 @@ export default class Channel {
     // Register user defined callbacks
     this.listeners[event] = callback;
   }
- 
+
 
   send(data) {
     return this.connection.send(data);
@@ -92,7 +92,7 @@ export default class Channel {
       this.blockchain = new Blockchain(this.identity);
     }
 
-    try{
+    try {
       const receipt = await this.blockchain.send(data);
 
       if (this.events['blockchain-hash']) {
@@ -105,8 +105,8 @@ export default class Channel {
       }
 
       return this.connection.send(JSON.stringify({'event': event, 'data': data, 'meta': {...meta, 'transaction_id': receipt.id, 'transaction_hash': receipt.hash}}));
-    }catch(e){
-      if (this.events['blockchain-error']) {  
+    } catch (e) {
+      if (this.events['blockchain-error']) {
         this.events['blockchain-error'].bind(this)(e);
       }
     };
@@ -117,7 +117,7 @@ export default class Channel {
       this.blockchain = new Blockchain(this.identity);
     }
 
-    try{  
+    try {
       const hash = await this.blockchain.confirm(transactionHash);
 
       if (this.events['blockchain-hash']) {
@@ -129,7 +129,7 @@ export default class Channel {
       }
 
       return this.connection.send(JSON.stringify({'event': event, 'data': transactionHash, 'meta': {'transaction_id': 1, 'transaction_hash': hash}}));
-    }catch(e){
+    } catch (e) {
       if (this.events['blockchain-error']) {
         this.events['blockchain-error'].bind(this)(e);
       }
@@ -167,26 +167,21 @@ export default class Channel {
     }
   }
 
-  handleMemberHandshake(message){
-    if(message.event == "system:member_list"){
+  handleMemberHandshake(message) {
+    if (message.event == 'system:member_list') {
       this.members = message.data.members;
-    }
-    else if(message.event == "system:member_joined"){
+    } else if (message.event == 'system:member_joined') {
       this.members = message.data.members;
-    }
-    else if(message.event == "system:member_left"){
+    } else if (message.event == 'system:member_left') {
       this.members = message.data.members;
-      if(this.portal){
+      if (this.portal) {
         this.portal.removeParticipant(message.data.member.uuid);
       }
-    }
-    else if(message.event == "system:video_request" && message.data.from != this.uuid){
+    } else if (message.event == 'system:video_request' && message.data.from != this.uuid) {
       this.portal.shareVideo(message.data);
-    }
-    else if(message.event == "system:video_accept" && message.data.to == this.uuid){
+    } else if (message.event == 'system:video_accept' && message.data.to == this.uuid) {
       this.portal.addIceCandidate(message.data);
-    }
-    else if(message.event == "system:video_offer" && message.data.to == this.uuid){
+    } else if (message.event == 'system:video_offer' && message.data.to == this.uuid) {
       this.portal.createAnswer(message.data);
     }
   }
@@ -195,7 +190,7 @@ export default class Channel {
     this.logger.log('Channel connected:', e);
     this.shouldReconnect = true;
 
-    //System init callback
+    // System init callback
     this.onSocketConnected(e);
   }
 
@@ -203,7 +198,7 @@ export default class Channel {
     this.logger.error('Channel error:', e);
     this.connection.close();
 
-    //System init error callback
+    // System init error callback
     this.onSocketError(e);
 
     // User defined callback

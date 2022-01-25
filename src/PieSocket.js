@@ -4,7 +4,7 @@ import Portal from './Portal';
 import pjson from '../package.json';
 import InvalidAuthException from './InvalidAuthException.js';
 import defaultOptions from './misc/DefaultOptions.js';
-import { v4 as uuidv4 } from 'uuid';
+import {v4 as uuidv4} from 'uuid';
 
 export default class PieSocket {
   constructor(options) {
@@ -17,46 +17,45 @@ export default class PieSocket {
 
   async subscribe(channelId, roomOptions={}) {
     return new Promise(async (resolve, reject) => {
+      if (roomOptions.video) {
+        // Force config when video is required
+        this.options.notifySelf = true;
+      }
 
-        if(roomOptions.video){
-            //Force config when video is required
-            this.options.notifySelf = true;
-        }
+      const uuid = uuidv4();
+      const endpoint = await this.getEndpoint(channelId, uuid);
 
-        const uuid = uuidv4();
-        const endpoint = await this.getEndpoint(channelId, uuid);
-
-        if (this.connections[channelId]) {
-          this.logger.log('Returning existing channel', channelId);
-          resolve(this.connections[channelId]);
-        }else{
-            this.logger.log('Creating new channel', channelId);
-            const channel = new Channel(endpoint, {
-                channelId: channelId,
-                onSocketConnected: () => {
-                    channel.uuid = uuid; 
-                    if(roomOptions.video){
-                        channel.portal =  new Portal(channel, {
-                            ...this.options,
-                            ...roomOptions
-                        });``
-                    }
-                    this.connections[channelId] = channel;    
-                    resolve(channel);    
-                },
-                onSocketError: () => {
-                    reject("Failed to make websocket connection");
-                },
+      if (this.connections[channelId]) {
+        this.logger.log('Returning existing channel', channelId);
+        resolve(this.connections[channelId]);
+      } else {
+        this.logger.log('Creating new channel', channelId);
+        const channel = new Channel(endpoint, {
+          channelId: channelId,
+          onSocketConnected: () => {
+            channel.uuid = uuid;
+            if (roomOptions.video) {
+              channel.portal = new Portal(channel, {
                 ...this.options,
-            });
-
-            if(typeof WebSocket == "undefined"){
-                //Resolves the promise in case WebSocket is not defined
-                channel.uuid = uuid; 
-                this.connections[channelId] = channel;    
-                resolve(channel);
+                ...roomOptions,
+              }); ``;
             }
+            this.connections[channelId] = channel;
+            resolve(channel);
+          },
+          onSocketError: () => {
+            reject('Failed to make websocket connection');
+          },
+          ...this.options,
+        });
+
+        if (typeof WebSocket == 'undefined') {
+          // Resolves the promise in case WebSocket is not defined
+          channel.uuid = uuid;
+          this.connections[channelId] = channel;
+          resolve(channel);
         }
+      }
     });
   }
 
@@ -134,8 +133,8 @@ export default class PieSocket {
       endpoint = endpoint + '&user='+this.options.userId;
     }
 
-    //Add uuid
-    endpoint = endpoint+"&uuid="+uuid;
+    // Add uuid
+    endpoint = endpoint+'&uuid='+uuid;
 
     return endpoint;
   }
