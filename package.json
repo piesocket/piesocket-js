@@ -40,11 +40,11 @@
         "babel-jest": "^27.4.6",
         "eslint": "^8.6.0",
         "eslint-config-google": "^0.14.0",
+        "jest": "^27.4.7",
         "webpack": "^5.9.0",
         "webpack-cli": "^4.2.0",
-        "webpack-dev-server": "^3.11.2",
-        "webpack-merge": "^5.4.0",
-        "jest": "^27.4.7"
+        "webpack-dev-server": "^3.11.3",
+        "webpack-merge": "^5.4.0"
     },
     "dependencies": {
         "uuid": "^8.3.2"
