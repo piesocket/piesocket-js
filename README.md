@@ -51,12 +51,14 @@ Reference: [Complete list of configuration options](https://github.com/piesocket
 
 2. Subscribe to a channel:
 ```javascript
-var channel = piesocket.subscribe(channelId); 
+piesocket.subscribe(channelId).then(ch => {
+  window.channel = ch;
+})
 ```
 
 
 3. Listen to an event:
-```javascript
+```
 channel.listen('event-name', function(data, meta){
     console.log("event-name received: ", data, meta);
 });
@@ -95,7 +97,6 @@ Parameters:
 - `data`: JSON data for the event.
 - `meta`: Optional information about the event in JSON format.
 
-Make sure to call the `publish` method after connection has been made i.e `on('open', callback)` has been called.
 
 ## Publish Events From Server
 Use the following POST request to publish a message from your server.
