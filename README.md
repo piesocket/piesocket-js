@@ -51,17 +51,22 @@ Reference: [Complete list of configuration options](https://github.com/piesocket
 
 2. Subscribe to a channel:
 ```javascript
-piesocket.subscribe(channelId).then(ch => {
-  window.channel = ch;
-})
+piesocket.subscribe(channelId);
 ```
+Above methods returns a `Promise`, which is resolve when the WebSocket connection is ready.
 
 
 3. Listen to an event:
 ```
-channel.listen('event-name', function(data, meta){
+piesocket.subscribe(channelId).then(channel => {
+  
+  //Connection is now open
+
+  channel.listen('event-name', function(data, meta){
     console.log("event-name received: ", data, meta);
-});
+  });
+
+})
 ```
 
 or, Listen to all events:
