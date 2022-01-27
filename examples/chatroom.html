@@ -71,7 +71,8 @@
 							<h3 class="text-lg leading-6 font-medium text-gray-900">
 								Members
 							</h3>
-							<ul id="members-list" role="list" style="max-height: 70%;" class="overflow-scroll divide-y divide-gray-200">
+							<ul id="members-list" role="list" style="max-height: 70%;"
+								class="overflow-scroll divide-y divide-gray-200">
 
 							</ul>
 
@@ -122,7 +123,8 @@
 				<div class="relative pb-8">
 					<div class="relative flex items-start space-x-3">
 						<div class="relative">
-							<img id="chat-sender-avatar" class="h-10 w-10 rounded-full bg-gray-400 flex items-center justify-center ring-8 ring-white"
+							<img id="chat-sender-avatar"
+								class="h-10 w-10 rounded-full bg-gray-400 flex items-center justify-center ring-8 ring-white"
 								src="https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?ixlib=rb-=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=8&w=256&h=256&q=80"
 								alt="">
 
@@ -173,18 +175,22 @@
 	</div>
 
 	<script>
-		window.username = prompt("Enter username");
-		if(!username){
-			//Do not allow without an username
-			window.location.reload();
+		username = window.location.hash.replace("#", "");
+		console.log(username);
+		if (!username) {
+			username = prompt("Enter username");
+			if (!username) {
+				//Do not allow without an username
+				window.location.reload();
+			}
 		}
 
 		/* Functions Start */
-		function addMessage(from, message, action="Wrote") {
+		function addMessage(from, message, action = "Wrote") {
 			var chatMessageComponent = document.getElementById("chat-message-component");
 
 			chatMessageComponent.querySelector("#chat-sender").innerText = from;
-			chatMessageComponent.querySelector("#chat-sender-avatar").src = "https://ui-avatars.com/api/?name="+(from.charAt(0));
+			chatMessageComponent.querySelector("#chat-sender-avatar").src = "https://ui-avatars.com/api/?name=" + (from.charAt(0));
 			chatMessageComponent.querySelector("#chat-action").innerText = action;
 			chatMessageComponent.querySelector("#chat-text").innerText = message;
 			document.getElementById("chat-room").innerHTML += chatMessageComponent.innerHTML;
@@ -193,7 +199,7 @@
 
 		function sendMessage() {
 			var message = document.getElementById("chat-message-input").value;
-			
+
 			//Publish message, this can be done from backend as well
 			channel.publish("new-message", {
 				message: message
@@ -204,14 +210,14 @@
 			document.getElementById("chat-message-input").value = "";
 		}
 
-		function refreshMembersList(){
+		function refreshMembersList() {
 			var membersListMarkup = "";
 
-			channel.members.forEach((member)=>{				
+			channel.members.forEach((member) => {
 				var memberListComponent = document.getElementById("member-list-component");
-				memberListComponent.querySelector("#member-avatar").src = "https://ui-avatars.com/api/?name="+(member.user.charAt(0));
+				memberListComponent.querySelector("#member-avatar").src = "https://ui-avatars.com/api/?name=" + (member.user.charAt(0));
 				memberListComponent.querySelector("#member-name").innerText = member.user;
-				membersListMarkup +=  memberListComponent.innerHTML;
+				membersListMarkup += memberListComponent.innerHTML;
 			});
 
 			document.getElementById("members-list").innerHTML = membersListMarkup;
@@ -232,16 +238,16 @@
 		piesocket.subscribe("chat-channel").then(ch => {
 			window.channel = ch;
 
-			channel.listen("new-message", function(data, meta){
+			channel.listen("new-message", function (data, meta) {
 				addMessage(meta.from, data.message);
 			});
 
-			channel.listen("system:member_joined", function(data, meta){
+			channel.listen("system:member_joined", function (data, meta) {
 				addMessage(data.member.user, "", "Joined the chat");
 				refreshMembersList();
 			});
-			
-			channel.listen("system:member_left", function(data, meta){
+
+			channel.listen("system:member_left", function (data, meta) {
 				addMessage(data.member.user, "", "Left the chat");
 				refreshMembersList();
 			});
