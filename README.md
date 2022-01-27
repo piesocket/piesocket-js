@@ -53,7 +53,7 @@ Reference: [Complete list of configuration options](https://github.com/piesocket
 ```javascript
 piesocket.subscribe(channelId);
 ```
-Above method returns a `Promise`, which is resolve when the WebSocket connection is ready.
+Above method returns a `Promise`, which is resolved when the WebSocket connection is ready.
 
 
 3. Listen to an event:
