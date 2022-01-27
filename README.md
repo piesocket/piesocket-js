@@ -71,13 +71,12 @@ channel.listen('*', function(event, data, meta){
 
 4. Listen to lifecycle events
 ```javascript
-channel.on('open', function(event){
-    console.log("PieSocket connected!");
+channel.on('close', function(event){
+    console.log("PieSocket disconnected!");
 });
 ```
 
 Following life-cycle events are available:
-  - `open`: Fired when WebSocket connect is established.
   - `message`: Fired when WebSocket message is received.
   - `error`: Fired when WebSocket connection errors occur.
   - `close`: Fired when WebSocket connection is closed.
@@ -186,9 +185,9 @@ Complete list of allowed configuration options
 - Clone the repo `git clone git@github.com:piesocket/piesocket-js.git`
 - Run `npm install`
 - Run `npm start`
-- Open `http://localhost:8080/examples/`
+- Open `http://localhost:8080` in browser
 
-Now you can interactively test the SDK and find sample codes.
+Now you can interactively test the SDK, add features and fix bugs.
 
 
 Documentation: [PieSocket WebSocket docs](https://piesocket.com/docs)
