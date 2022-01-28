@@ -51,7 +51,7 @@ See the [Channels documentation](https://www.piesocket.com/docs/3.0/channels) to
 ### Portals
 Portals are programmable video streams over WebRTC, they allow you to build powerful video applications.
 
-See the [Portals documentation](https://www.piesocket.com/docs/3.0/portals) to learn more about how to use Channels.
+See the [Portals documentation](https://www.piesocket.com/docs/3.0/portals) to learn more about how to use Portals.
 
 ## Development
 - Clone the repo `git clone git@github.com:piesocket/piesocket-js.git`
