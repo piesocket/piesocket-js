@@ -119,33 +119,6 @@ Content-Type: application/json
 ```
 See code examples for this request in PHP, NodeJS, Ruby, Python, Java, and Go in [PieSocket documentation](https://www.piesocket.com/docs/3.0/overview).
 
-## Blockchain Realtime
-Send 100% trustworthy messages to connected peers and maintain a proof of the message on the Ethereum Blockchain network. 
-
-To send a message on the Blockhain
-```javascript
-channel.publish("event-name", data, {
-  blockchain: true
-});
-```
-`payload` should be a string. 
-User will have to sign this message using the [MetaMask](https://metamask.io/download) Ethereum Wallet.
-
-Optinally, to confirm a message on the receiver's end, to create a proof-of-acceptance on the Blockchain. Use the following method.
-```javascript
-channel.listen("event-name", function(data, meta){
-  if(meta && meta.blockchain && meta.transaction_hash){
-    //This is blockchain message, accept the contract on Ethereum blockchain.
-    channel.confirmOnBlockchain("blockchain-confirmation", meta.transaction_hash);
-  }
-})
-```
-`meta.transaction_hash` is the transaction hash for the initial blockchain message.
-
-Above code emits an event `blockchain-confirmation` with the confirmation contract's transaction hash in `meta`.
-
-To get a list of blockchain messages pending acceptance, use the [REST API](https://www.piesocket.com/docs/3.0/rest-api).
-
 ## PieSocket Methods
 List of available methods on the `PieSocket` object
 
@@ -185,7 +158,34 @@ Complete list of allowed configuration options
 | blockchainTestMode        | Enable/disable test mode, defaults to `false` i.e., Ethreum main network. Set to `true` for Rinkeby test network.     |  `false` |
 | blockchainGasFee        | Gas fee to set on Ethreum contract calls     |  `41000` |
 
-  
+
+## Blockchain Realtime
+Send 100% trustworthy messages to connected peers and maintain a proof of the message on the Ethereum Blockchain network. 
+
+To send a message on the Blockhain
+```javascript
+channel.publish("event-name", data, {
+  blockchain: true
+});
+```
+User will have to sign this message using the [MetaMask](https://metamask.io/download) Ethereum Wallet.
+
+Optinally, to confirm a message on the receiver's end i.e. to create a proof-of-acceptance on the Blockchain. Use the following method.
+```javascript
+channel.listen("event-name", function(data, meta){
+  if(meta && meta.blockchain && meta.transaction_hash){
+    //This is blockchain message, accept the contract on Ethereum blockchain.
+    channel.confirmOnBlockchain("blockchain-confirmation", meta.transaction_hash);
+  }
+})
+```
+`meta.transaction_hash` is the transaction hash for the initial blockchain message.
+
+Above code emits an event `blockchain-confirmation` to the sender, after confirmation is successful. 
+
+To get a list of blockchain messages pending acceptance, use the [REST API](https://www.piesocket.com/docs/3.0/rest-api).
+
+
 ## Development
 - Clone the repo `git clone git@github.com:piesocket/piesocket-js.git`
 - Run `npm install`
