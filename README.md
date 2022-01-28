@@ -20,7 +20,7 @@ npm i piesocket-js
 
 CDN
 ```html
-<script src="https://unpkg.com/piesocket-js@1"></script>
+<script src="https://unpkg.com/piesocket-js@2"></script>
 ```
 
 ## Importing
@@ -61,7 +61,6 @@ Above method returns a `Promise`, which is resolved when the WebSocket connectio
 piesocket.subscribe(channelId).then(channel => {
 
   //Connection is now open
-
   channel.listen('event-name', function(data, meta){
     console.log("event-name received: ", data, meta);
   });
