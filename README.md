@@ -68,8 +68,8 @@ Complete list of allowed configuration options
 | authHeaders        | Headers to include with authEndpoint call.                   |  `{}` |
 | forceAuth        | Force authentication on all channels.                    |  `false` |
 | userId        | User ID, used when `user` does not exists in JWT payload.     |  `anonymous` |
-| blockchainTestMode        | Enable/disable test mode, defaults to `false` i.e., Ethreum main network. Set to `true` for Rinkeby test network.     |  `false` |
-| blockchainGasFee        | Gas fee to set on Ethreum contract calls     |  `41000` |
+| blockchainTestMode        | Enable/disable test mode, defaults to `false` i.e., Ethereum main network. Set to `true` for Rinkeby test network.     |  `false` |
+| blockchainGasFee        | Gas fee to set on Ethereum contract calls     |  `41000` |
 
 
 ## PieSocket Object
