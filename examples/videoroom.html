@@ -219,7 +219,7 @@
         //Initialize PieSocket
         var piesocket = new PieSocket({
             clusterId: 'demo',
-            apiKey: 'oCdCMcMPQpbvNjUIzqtvF1d2X2okWpDQj4AwARJuAgtjhzKxVEjQU6IdCjwm',
+            apiKey: 'wDouy4TMvN5Qw4SkhmZ35skbCBKnlv0fDqKQfhmp',
             consoleLogs: true,
             notifySelf: true,
             presence: true,
@@ -227,7 +227,8 @@
         });
 
         piesocket.subscribe("video-chat-channel", {
-            video: true,
+            video: false,
+            audio: true,
             onLocalVideo: (stream, video) => {
                 var localVideo = document.getElementById("self-video");
                 localVideo.muted = true;

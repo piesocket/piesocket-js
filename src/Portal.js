@@ -20,9 +20,10 @@ export default class Portal {
       ],
     };
     this.constraints = {
-      video: true,
-      audio: true,
+      video: typeof identity.video == "undefined" ? false: identity.video,
+      audio: typeof identity.audio == "undefined" ? true: identity.audio,
     };
+    console.log(this.constraints);
 
     this.participants = [];
     this.isNegotiating = [];
@@ -37,7 +38,7 @@ export default class Portal {
      */
   init() {
     if (typeof navigator!='undefined' && navigator.mediaDevices.getUserMedia) {
-      navigator.mediaDevices.getUserMedia(this.constraints).then(this.getUserMediaSuccess.bind(this)).catch(this.errorHandler);
+      navigator.mediaDevices.getUserMedia(this.constraints).then(this.getUserMediaSuccess.bind(this)).catch(this.errorHandler.bind(this));
       return true;
     } else {
       this.logger.error('Your browser does not support getUserMedia API');
