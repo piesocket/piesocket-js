@@ -227,7 +227,8 @@
         });
 
         piesocket.subscribe("video-chat-channel", {
-            video: false,
+            rtcMode: "one-to-many",
+            video: true,
             audio: true,
             onLocalVideo: (stream, video) => {
                 var localVideo = document.getElementById("self-video");

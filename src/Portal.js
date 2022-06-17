@@ -23,7 +23,6 @@ export default class Portal {
       video: typeof identity.video == "undefined" ? false: identity.video,
       audio: typeof identity.audio == "undefined" ? true: identity.audio,
     };
-    console.log(this.constraints);
 
     this.participants = [];
     this.isNegotiating = [];
@@ -157,14 +156,19 @@ export default class Portal {
      * @param {*} stream
      */
   getUserMediaSuccess(stream) {
-    this.localStream = stream;
+
+    if(this.identity.rtcMode == "many-to-many"){
+      this.localStream = stream;
+
+      if(typeof this.identity.onLocalVideo == 'function') {
+        this.identity.onLocalVideo(stream, this);
+      }
+    }
+
     this.channel.publish('system:video_request', {
       from: this.channel.uuid,
     });
 
-    if (typeof this.identity.onLocalVideo == 'function') {
-      this.identity.onLocalVideo(stream, this);
-    }
   }
 
 
