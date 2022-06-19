@@ -78,9 +78,11 @@ export default class Portal {
       this.isNegotiating[signal.from] = (rtcConnection.signalingState != 'stable');
     };
 
-    this.localStream.getTracks().forEach((track) => {
-      rtcConnection.addTrack(track, this.localStream);
-    });
+    if(this.identity.shouldBroadcast){
+      this.localStream.getTracks().forEach((track) => {
+        rtcConnection.addTrack(track, this.localStream);
+      });  
+    }
 
     this.isNegotiating[signal.from] = false;
     rtcConnection.onnegotiationneeded = async () => {
