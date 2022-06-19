@@ -227,7 +227,7 @@
         });
 
         piesocket.subscribe("video-chat-channel", {
-            rtcMode: "one-to-many",
+            shouldBroadcast: username=="anand",
             video: true,
             audio: true,
             onLocalVideo: (stream, video) => {

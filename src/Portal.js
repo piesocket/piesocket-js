@@ -45,7 +45,11 @@ export default class Portal {
     }
   }
 
-  shareVideo(signal, isCaller=true) {
+  shareVideo(signal, isCaller=true) {    
+    if(!this.identity.shouldBroadcast && isCaller && !signal.isBroadcasting){
+      console.log("Refusing to call, denied broadcast request");
+      return;
+    }
     const rtcConnection = new PeerConnection(this.peerConnectionConfig);
 
     rtcConnection.onicecandidate = (event) => {
@@ -156,19 +160,16 @@ export default class Portal {
      * @param {*} stream
      */
   getUserMediaSuccess(stream) {
+    this.localStream = stream;
 
-    if(this.identity.rtcMode == "many-to-many"){
-      this.localStream = stream;
-
-      if(typeof this.identity.onLocalVideo == 'function') {
-        this.identity.onLocalVideo(stream, this);
-      }
+    if(typeof this.identity.onLocalVideo == 'function') {
+      this.identity.onLocalVideo(stream, this);
     }
 
     this.channel.publish('system:video_request', {
       from: this.channel.uuid,
+      isBroadcasting: this.identity.shouldBroadcast
     });
-
   }
 
 
