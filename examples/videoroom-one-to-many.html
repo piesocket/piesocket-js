@@ -228,7 +228,7 @@
 
         piesocket.subscribe("video-chat-channel", {
             shouldBroadcast: username=="admin",
-            video: username=="admin",
+            video: true,
             portal: true,
             onLocalVideo: (stream, video) => {
                 var localVideo = document.getElementById("self-video");
