@@ -18,7 +18,7 @@ npm i piesocket-js
 
 CDN
 ```html
-<script src="https://unpkg.com/piesocket-js@2"></script>
+<script src="https://unpkg.com/piesocket-js@3"></script>
 ```
 
 ## Importing
