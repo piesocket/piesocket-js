@@ -17,7 +17,7 @@ export default class PieSocket {
 
   async subscribe(channelId, roomOptions={}) {
     return new Promise(async (resolve, reject) => {
-      if (roomOptions.video || roomOptions.audio) {
+      if (roomOptions.video || roomOptions.audio || roomOptions.portal) {
         // Force config when video is required
         this.options.notifySelf = true;
       }
@@ -34,7 +34,7 @@ export default class PieSocket {
           channelId: channelId,
           onSocketConnected: () => {
             channel.uuid = uuid;
-            if (roomOptions.video || roomOptions.audio) {
+            if (roomOptions.video || roomOptions.audio || roomOptions.portal) {
               channel.portal = new Portal(channel, {
                 ...this.options,
                 ...roomOptions,

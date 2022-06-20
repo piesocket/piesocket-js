@@ -227,7 +227,9 @@
         });
 
         piesocket.subscribe("video-chat-channel", {
-            video: true,
+            shouldBroadcast: username=="admin",
+            video: username=="admin",
+            portal: true,
             onLocalVideo: (stream, video) => {
                 var localVideo = document.getElementById("self-video");
                 localVideo.muted = true;
