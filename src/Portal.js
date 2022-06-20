@@ -2,6 +2,12 @@ import Logger from './Logger.js';
 import IceCandidate from './misc/RTCIceCandidate';
 import PeerConnection from './misc/RTCPeerConnection';
 import SessionDescription from './misc/RTCSessionDescription';
+const defaultPortalOptions = {
+  shouldBroadcast: true,
+  portal: true,
+  video: false,
+  audio: true
+};
 
 export default class Portal {
   /**
@@ -11,17 +17,17 @@ export default class Portal {
   constructor(channel, identity) {
     this.channel = channel;
     this.logger = new Logger(identity);
-    this.identity = identity;
+    this.identity = { ...defaultPortalOptions, ...identity };
     this.localStream = null;
     this.peerConnectionConfig = {
       'iceServers': [
-        {'urls': 'stun:stun.stunprotocol.org:3478'},
-        {'urls': 'stun:stun.l.google.com:19302'},
+        { 'urls': 'stun:stun.stunprotocol.org:3478' },
+        { 'urls': 'stun:stun.l.google.com:19302' },
       ],
     };
     this.constraints = {
-      video: typeof identity.video == "undefined" ? false: identity.video,
-      audio: typeof identity.audio == "undefined" ? true: identity.audio,
+      video: identity.video,
+      audio: identity.audio,
     };
 
     this.participants = [];
@@ -36,7 +42,12 @@ export default class Portal {
      * Initialize local video
      */
   init() {
-    if (typeof navigator!='undefined' && navigator.mediaDevices.getUserMedia) {
+    if (!this.constraints.video && !this.constraints.audio) {
+      this.requestPeerVideo();
+      return;
+    }
+
+    if (typeof navigator != 'undefined' && navigator.mediaDevices.getUserMedia) {
       navigator.mediaDevices.getUserMedia(this.constraints).then(this.getUserMediaSuccess.bind(this)).catch(this.errorHandler.bind(this));
       return true;
     } else {
@@ -45,11 +56,12 @@ export default class Portal {
     }
   }
 
-  shareVideo(signal, isCaller=true) {    
-    if(!this.identity.shouldBroadcast && isCaller && !signal.isBroadcasting){
+  shareVideo(signal, isCaller = true) {
+    if (!this.identity.shouldBroadcast && isCaller && !signal.isBroadcasting) {
       console.log("Refusing to call, denied broadcast request");
       return;
     }
+
     const rtcConnection = new PeerConnection(this.peerConnectionConfig);
 
     rtcConnection.onicecandidate = (event) => {
@@ -63,7 +75,7 @@ export default class Portal {
     };
 
     rtcConnection.ontrack = (event) => {
-      if (event.track.kind!='video') {
+      if (event.track.kind != 'video') {
         return;
       }
 
@@ -78,43 +90,50 @@ export default class Portal {
       this.isNegotiating[signal.from] = (rtcConnection.signalingState != 'stable');
     };
 
-    if(this.identity.shouldBroadcast){
+    if (this.localStream) {
       this.localStream.getTracks().forEach((track) => {
         rtcConnection.addTrack(track, this.localStream);
-      });  
+      });
     }
 
     this.isNegotiating[signal.from] = false;
+    
+
     rtcConnection.onnegotiationneeded = async () => {
-      if (!isCaller) {
-        return;
-      }
-
-      console.log('I need negotiation');
-
- 			if (this.isNegotiating[signal.from]) {
-			    console.log('SKIP nested negotiations');
-			    return;
-		    }
-
- 			this.isNegotiating[signal.from] = true;
-
-
- 			const description = await rtcConnection.createOffer();
-      await rtcConnection.setLocalDescription(description);
-
-      console.log('Making offer');
-      // Send a call offer
-      this.channel.publish('system:video_offer', {
-        'from': this.channel.uuid,
-        'to': signal.from,
-        'sdp': rtcConnection.localDescription,
-      });
+      await this.sendVideoOffer(signal, rtcConnection, isCaller);
     };
 
     this.participants[signal.from] = {
       rtc: rtcConnection,
     };
+  }
+
+  async sendVideoOffer(signal, rtcConnection, isCaller) {
+
+    if (!isCaller) {
+      return;
+    }
+
+
+    if (this.isNegotiating[signal.from]) {
+      console.log('SKIP nested negotiations');
+      return;
+    }
+
+    this.isNegotiating[signal.from] = true;
+
+
+    const description = await rtcConnection.createOffer();
+    await rtcConnection.setLocalDescription(description);
+
+    console.log('Making offer');
+    // Send a call offer
+    this.channel.publish('system:video_offer', {
+      'from': this.channel.uuid,
+      'to': signal.from,
+      'sdp': rtcConnection.localDescription,
+    });
+
   }
 
   removeParticipant(uuid) {
@@ -131,7 +150,7 @@ export default class Portal {
   }
 
   createAnswer(signal) {
-    return new Promise(async (resolve, reject)=> {
+    return new Promise(async (resolve, reject) => {
       if (!this.participants[signal.from] || !this.participants[signal.from].rtc) {
         console.log('Starting call in createAnswer');
         this.shareVideo(signal, false);
@@ -140,7 +159,7 @@ export default class Portal {
       await this.participants[signal.from].rtc.setRemoteDescription(new SessionDescription(signal.sdp));
       // Only create answers in response to offers
       if (signal.sdp.type == 'offer') {
-        this.logger.log('Got an offer from '+signal.from, signal);
+        this.logger.log('Got an offer from ' + signal.from, signal);
         const description = await this.participants[signal.from].rtc.createAnswer();
 
         await this.participants[signal.from].rtc.setLocalDescription(description);
@@ -151,7 +170,7 @@ export default class Portal {
         });
         resolve();
       } else {
-        this.logger.log('Got an asnwer from '+signal.from);
+        this.logger.log('Got an asnwer from ' + signal.from);
         resolve();
       }
     });
@@ -164,16 +183,19 @@ export default class Portal {
   getUserMediaSuccess(stream) {
     this.localStream = stream;
 
-    if(typeof this.identity.onLocalVideo == 'function') {
+    if (typeof this.identity.onLocalVideo == 'function') {
       this.identity.onLocalVideo(stream, this);
     }
 
+    this.requestPeerVideo();
+  }
+
+  requestPeerVideo() {
     this.channel.publish('system:video_request', {
       from: this.channel.uuid,
       isBroadcasting: this.identity.shouldBroadcast
     });
   }
-
 
   errorHandler(e) {
     this.logger.error('Portal error', e);
