@@ -222,6 +222,6 @@ export default class Channel {
       return;
     }
     this.logger.log('Reconnecting');
-    this.connect();
+    this.connection = this.connect();
   }
 }
