@@ -66,7 +66,7 @@ export default class Portal {
 
     rtcConnection.onicecandidate = (event) => {
       if (event.candidate != null) {
-        this.channel.publish('system:video_accept', {
+        this.channel.publish('system:portal_candidate', {
           'from': this.channel.uuid,
           'to': signal.from,
           'ice': event.candidate,
@@ -163,7 +163,7 @@ export default class Portal {
         const description = await this.participants[signal.from].rtc.createAnswer();
 
         await this.participants[signal.from].rtc.setLocalDescription(description);
-        this.channel.publish('system:video_offer', {
+        this.channel.publish('system:video_answer', {
           'from': this.channel.uuid,
           'to': signal.from,
           'sdp': this.participants[signal.from].rtc.localDescription,
@@ -171,9 +171,14 @@ export default class Portal {
         resolve();
       } else {
         this.logger.log('Got an asnwer from ' + signal.from);
+
         resolve();
       }
     });
+  }
+
+  handleAnswer(signal){
+    this.participants[signal.from].rtc.setRemoteDescription(new SessionDescription(signal.sdp));
   }
 
   /**
@@ -191,7 +196,20 @@ export default class Portal {
   }
 
   requestPeerVideo() {
-    this.channel.publish('system:video_request', {
+    var eventName = 'system:portal_broadcaster';
+    
+    if(!this.identity.shouldBroadcast){
+      eventName = 'system:portal_watcher';
+    }
+
+    this.channel.publish(eventName, {
+      from: this.channel.uuid,
+      isBroadcasting: this.identity.shouldBroadcast
+    });
+  }
+
+  requestOfferFromPeer(){
+    this.channel.publish("system:video_request", {
       from: this.channel.uuid,
       isBroadcasting: this.identity.shouldBroadcast
     });
