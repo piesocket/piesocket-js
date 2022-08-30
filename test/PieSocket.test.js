@@ -3,8 +3,9 @@ import PieSocket from '../src/PieSocket';
 import Logger from '../src/Logger';
 import DefaultOptions from '../src/misc/DefaultOptions';
 import Socket from '../src/misc/WebSocket';
+const module = require('../package.json')
 
-const currentVersion = "2.0.0";
+const currentVersion = module.version;
 const pieSocketProperties = ['options', 'connections', 'logger'];
 const channelProperties = ['events', 'listeners', "members", "portal", "uuid", "onSocketConnected", "onSocketError", 'endpoint', 'identity', 'connection', 'shouldReconnect', 'logger'];
 
@@ -165,7 +166,7 @@ describe('PieSocket', function () {
     it('#getEndpoint - Returns websocket endpoint', done => {
       piesocket.options.forceAuth = false;      
       piesocket.getEndpoint('test-channel', 'xxxx').then((result) => {
-        expect(result).toEqual('wss://nyc1.piesocket.com/v3/test-channel?api_key=xxx&notify_self=0&source=jssdk&v=2.0.0&presence=0&uuid=xxxx');
+        expect(result).toEqual(`wss://nyc1.piesocket.com/v3/test-channel?api_key=xxx&notify_self=0&source=jssdk&v=${currentVersion}&presence=0&uuid=xxxx`);
         done();
       });
     });
@@ -173,7 +174,7 @@ describe('PieSocket', function () {
     it('#getEndpoint - Returns websocket endpoint with JWT', done => {
       piesocket.options.jwt = 'testcode';      
       piesocket.getEndpoint('test-channel', 'xxxx').then((result) => {
-        expect(result).toEqual('wss://nyc1.piesocket.com/v3/test-channel?api_key=xxx&notify_self=0&source=jssdk&v=2.0.0&presence=0&jwt=testcode&uuid=xxxx');
+        expect(result).toEqual(`wss://nyc1.piesocket.com/v3/test-channel?api_key=xxx&notify_self=0&source=jssdk&v=${currentVersion}&presence=0&jwt=testcode&uuid=xxxx`);
         done();
       });
     });
@@ -188,7 +189,7 @@ describe('PieSocket', function () {
       });
 
       piesocket.getEndpoint('test-channel', 'xxxx').then((result) => {
-        expect(result).toEqual('wss://nyc1.piesocket.com/v3/test-channel?api_key=xxx&notify_self=0&source=jssdk&v=2.0.0&presence=0&jwt=test-token&uuid=xxxx');
+        expect(result).toEqual(`wss://nyc1.piesocket.com/v3/test-channel?api_key=xxx&notify_self=0&source=jssdk&v=${currentVersion}&presence=0&jwt=test-token&uuid=xxxx`);
         done();
       });
     });
@@ -201,7 +202,7 @@ describe('PieSocket', function () {
       });
 
       piesocket.getEndpoint('test-channel','xxxx').then((result) => {
-        expect(result).toEqual('wss://nyc1.piesocket.com/v3/test-channel?api_key=xxx&notify_self=0&source=jssdk&v=2.0.0&presence=0&uuid=xxxx');
+        expect(result).toEqual(`wss://nyc1.piesocket.com/v3/test-channel?api_key=xxx&notify_self=0&source=jssdk&v=${currentVersion}&presence=0&uuid=xxxx`);
         done();
       });
     });
@@ -216,7 +217,7 @@ describe('PieSocket', function () {
       });
 
       piesocket.getEndpoint('private-channel','xxxx').then((result) => {
-        expect(result).toEqual('wss://nyc1.piesocket.com/v3/private-channel?api_key=xxx&notify_self=0&source=jssdk&v=2.0.0&presence=0&jwt=test-token&uuid=xxxx');
+        expect(result).toEqual(`wss://nyc1.piesocket.com/v3/private-channel?api_key=xxx&notify_self=0&source=jssdk&v=${currentVersion}&presence=0&jwt=test-token&uuid=xxxx`);
         done();
       });
     });
@@ -226,7 +227,7 @@ describe('PieSocket', function () {
       piesocket.options.forceAuth = false;      
       piesocket.options.userId = 1;      
       piesocket.getEndpoint('test-channel', 'xxxx').then((result) => {
-        expect(result).toEqual('wss://nyc1.piesocket.com/v3/test-channel?api_key=xxx&notify_self=0&source=jssdk&v=2.0.0&presence=0&user=1&uuid=xxxx');
+        expect(result).toEqual(`wss://nyc1.piesocket.com/v3/test-channel?api_key=xxx&notify_self=0&source=jssdk&v=${currentVersion}&presence=0&user=1&uuid=xxxx`);
         done();
       });
     });

@@ -5,49 +5,49 @@ import Channel from '../src/Channel';
 
 //Mocks
 const mockAddIceCandidate = jest.fn();
-const mockCreateAnswer = jest.fn().mockImplementation(()=> {
+const mockCreateAnswer = jest.fn().mockImplementation(() => {
     return Promise.resolve();
 });
-const mockSetLocalDescription = jest.fn().mockImplementation(()=> {
+const mockSetLocalDescription = jest.fn().mockImplementation(() => {
     return Promise.resolve();
 });
-const mockSetRemoteDescription = jest.fn().mockImplementation(()=> {
+const mockSetRemoteDescription = jest.fn().mockImplementation(() => {
     return Promise.resolve();
 });
 jest.mock('../src/misc/RTCPeerConnection.js', () => {
-  return jest.fn().mockImplementation(() => {
-    return {
-        addIceCandidate: mockAddIceCandidate,
-        setRemoteDescription: mockSetRemoteDescription,
-        createAnswer: mockCreateAnswer,
-        setLocalDescription: mockSetLocalDescription
-    };
-  });
+    return jest.fn().mockImplementation(() => {
+        return {
+            addIceCandidate: mockAddIceCandidate,
+            setRemoteDescription: mockSetRemoteDescription,
+            createAnswer: mockCreateAnswer,
+            setLocalDescription: mockSetLocalDescription
+        };
+    });
 });
 
 jest.mock('../src/misc/RTCSessionDescription.js', () => {
-  return jest.fn().mockImplementation(() => {
-    return {
-    };
-  });
+    return jest.fn().mockImplementation(() => {
+        return {
+        };
+    });
 });
 
 jest.mock('../src/misc/RTCIceCandidate.js', () => {
-  return jest.fn().mockImplementation(() => {
-    return {
-    };
-  });
+    return jest.fn().mockImplementation(() => {
+        return {
+        };
+    });
 });
 
 const mockWebSocketClose = jest.fn();
 const mockWebSocketSend = jest.fn();
 jest.mock('../src/misc/WebSocket.js', () => {
-  return jest.fn().mockImplementation(() => {
-    return {
-      close: mockWebSocketClose,
-      send: mockWebSocketSend
-    };
-  });
+    return jest.fn().mockImplementation(() => {
+        return {
+            close: mockWebSocketClose,
+            send: mockWebSocketSend
+        };
+    });
 });
 
 const mockOnLocalVideo = jest.fn();
@@ -61,9 +61,9 @@ describe('Portal', function () {
     let uuidLocal;
     let uuidRemote;
 
-    beforeAll(()=>{
+    beforeAll(() => {
         const roomOptions = {
-            video: true            
+            video: true
         };
 
         uuidLocal = "local-tester-uuid";
@@ -82,23 +82,26 @@ describe('Portal', function () {
         });
     });
 
-    it('#getUserMediaSuccess - Starts video call as caller, on system:video_request', ()=> {
+    it('#getUserMediaSuccess - Starts video call as caller, on system:video_request', () => {
         const videoStream = {
-            getTracks : jest.fn().mockImplementation(()=>{
+            getTracks: jest.fn().mockImplementation(() => {
                 return [];
             })
         };
         portal.getUserMediaSuccess(videoStream);
         expect(mockWebSocketSend).toHaveBeenCalledWith(JSON.stringify({
-            "event": "system:video_request",
-            "data": { "from": uuidLocal}
+            "event": "system:portal_broadcaster",
+            "data": {
+                "from": uuidLocal,
+                "isBroadcasting": true
+            },
         }));
         expect(mockOnLocalVideo).toHaveBeenCalledWith(videoStream, portal);
     });
 
-    it('#shareVideo - Initialize video call as caller, on system:video_request or system:video_offer', ()=> {
+    it('#shareVideo - Initialize video call as caller, on system:video_request or system:video_offer', () => {
         const shareVideo = portal.shareVideo({
-            from : uuidRemote
+            from: uuidRemote
         }, true);
         const remoteConnection = portal.participants[uuidRemote];
         expect(typeof remoteConnection.rtc).toEqual("object");
@@ -108,7 +111,7 @@ describe('Portal', function () {
         expect(typeof remoteConnection.rtc.onnegotiationneeded).toEqual("function");
     });
 
-    it('#addIceCandidate - Adds Ice Candidate', ()=> {
+    it('#addIceCandidate - Adds Ice Candidate', () => {
         portal.addIceCandidate({
             from: uuidRemote
         });
@@ -122,25 +125,24 @@ describe('Portal', function () {
             sdp: {
                 type: "offer"
             }
-        }).then(()=>{
+        }).then(() => {
             expect(mockSetRemoteDescription).toHaveBeenCalled();
             expect(mockCreateAnswer).toHaveBeenCalled();
-            expect(mockSetLocalDescription).toHaveBeenCalled();    
-        
+            expect(mockSetLocalDescription).toHaveBeenCalled();
+
             expect(mockWebSocketSend).toHaveBeenCalledWith(JSON.stringify({
-                "event": "system:video_offer",
-                "data": { 
+                "event": "system:video_answer",
+                "data": {
                     "from": uuidLocal,
-                    "to": uuidRemote,
-                    'sdp': remoteConnection.rtc.localDescription
+                    "to": uuidRemote
                 }
             }));
-    
+
             done();
         });
     });
 
-    it('#removeParticipant - Removes portal participant', ()=> {
+    it('#removeParticipant - Removes portal participant', () => {
         portal.removeParticipant(uuidRemote);
         expect(portal.participants).not.toHaveProperty(uuidRemote);
         expect(portal.participants).toHaveLength(0);
