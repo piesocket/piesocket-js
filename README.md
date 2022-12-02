@@ -48,11 +48,6 @@ Channels are realtime PubSub connections over WebSocket, they allow you to:
 
 See the [Channels documentation](https://www.piesocket.com/docs/3.0/channels) to learn more about how to use Channels.
 
-### Portals
-Portals are programmable video streams over WebRTC, they allow you to build powerful video applications.
-
-See the [Portals documentation](https://www.piesocket.com/docs/3.0/portals) to learn more about how to use Portals.
-
 ## Configuration
 Complete list of allowed configuration options
 
