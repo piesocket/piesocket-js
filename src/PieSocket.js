@@ -1,6 +1,5 @@
 import Channel from './Channel.js';
 import Logger from './Logger.js';
-import Portal from './Portal';
 import pjson from '../package.json';
 import InvalidAuthException from './InvalidAuthException.js';
 import defaultOptions from './misc/DefaultOptions.js';
@@ -17,10 +16,6 @@ export default class PieSocket {
 
   async subscribe(channelId, roomOptions={}) {
     return new Promise(async (resolve, reject) => {
-      if (roomOptions.video || roomOptions.audio || roomOptions.portal) {
-        // Force config when video is required
-        this.options.notifySelf = true;
-      }
 
       const uuid = uuidv4();
       const endpoint = await this.getEndpoint(channelId, uuid);
@@ -34,12 +29,6 @@ export default class PieSocket {
           channelId: channelId,
           onSocketConnected: () => {
             channel.uuid = uuid;
-            if (roomOptions.video || roomOptions.audio || roomOptions.portal) {
-              channel.portal = new Portal(channel, {
-                ...this.options,
-                ...roomOptions,
-              }); ``;
-            }
             this.connections[channelId] = channel;
             resolve(channel);
           },
