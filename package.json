@@ -1,54 +1,54 @@
 {
-    "name": "piesocket-js",
-    "version": "4.2.0",
-    "description": "PieSocket Javascript Client",
-    "main": "src/index.js",
-    "unpkg": "dist/piesocket.js",
-    "scripts": {
-        "test": "jest",
-        "coverage": "jest --coverage",
-        "lint": "eslint src --fix",
-        "start": "NODE_ENV=development webpack serve --mode=development --config webpack.dev.js ",
-        "build": "webpack --mode=production --config webpack.prod.js",
-        "prepare": "npm run build",
-        "watch": "webpack --mode=development --config webpack.dev.js --watch"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/piesocket/piesocket-js.git"
-    },
-    "keywords": [
-        "piesocket",
-        "client",
-        "websocket",
-        "pubsub",
-        "http"
-    ],
-    "author": "PieSocket",
-    "license": "MIT",
-    "bugs": {
-        "url": "https://github.com/piesocket/piesocket-js/issues"
-    },
-    "homepage": "https://github.com/piesocket/piesocket-js#readme",
-    "devDependencies": {
-        "@babel/cli": "^7.16.8",
-        "@babel/core": "^7.16.7",
-        "@babel/polyfill": "^7.12.1",
-        "@babel/preset-env": "^7.16.8",
-        "@babel/register": "^7.16.9",
-        "@webpack-cli/serve": "^1.1.0",
-        "babel-jest": "^27.4.6",
-        "cypress": "^9.3.1",
-        "eslint": "^8.6.0",
-        "eslint-config-google": "^0.14.0",
-        "jest": "^27.4.7",
-        "puppeteer": "^13.1.2",
-        "webpack": "^5.9.0",
-        "webpack-cli": "^4.2.0",
-        "webpack-dev-server": "^4.7.3",
-        "webpack-merge": "^5.4.0"
-    },
-    "dependencies": {
-        "uuid": "^8.3.2"
-    }
+  "name": "piesocket-js",
+  "version": "4.2.1",
+  "description": "PieSocket Javascript Client",
+  "main": "src/index.js",
+  "unpkg": "dist/piesocket.js",
+  "scripts": {
+    "test": "jest",
+    "coverage": "jest --coverage",
+    "lint": "eslint src --fix",
+    "start": "NODE_ENV=development webpack serve --mode=development --config webpack.dev.js ",
+    "build": "webpack --mode=production --config webpack.prod.js",
+    "prepare": "npm run build",
+    "watch": "webpack --mode=development --config webpack.dev.js --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/piesocket/piesocket-js.git"
+  },
+  "keywords": [
+    "piesocket",
+    "client",
+    "websocket",
+    "pubsub",
+    "http"
+  ],
+  "author": "PieSocket",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/piesocket/piesocket-js/issues"
+  },
+  "homepage": "https://github.com/piesocket/piesocket-js#readme",
+  "devDependencies": {
+    "@babel/cli": "^7.16.8",
+    "@babel/core": "^7.16.7",
+    "@babel/polyfill": "^7.12.1",
+    "@babel/preset-env": "^7.16.8",
+    "@babel/register": "^7.16.9",
+    "@webpack-cli/serve": "^1.1.0",
+    "babel-jest": "^27.4.6",
+    "cypress": "^9.3.1",
+    "eslint": "^8.6.0",
+    "eslint-config-google": "^0.14.0",
+    "jest": "^27.4.7",
+    "puppeteer": "^13.1.2",
+    "webpack": "^5.9.0",
+    "webpack-cli": "^4.2.0",
+    "webpack-dev-server": "^4.7.3",
+    "webpack-merge": "^5.4.0"
+  },
+  "dependencies": {
+    "uuid": "^8.3.2"
+  }
 }
