@@ -56,7 +56,7 @@ describe("Chatroom.html", () => {
 
         //Check after removing page 2
         await page2.close();
-        await page.waitForTimeout(400);
+        await page.waitForTimeout(1000);
         videos = await page.$$("video");
         expect(videos.length).toEqual(1);
     });
@@ -91,7 +91,7 @@ describe("Chatroom.html", () => {
 
         //Check after removing page 2
         await page2.close();
-        await page.waitForTimeout(1000);
+        await page.waitForTimeout(700);
         membersList = await page.$("#members-list");
         members = await membersList.$$("#member-name");
         expect(members.length).toEqual(1);
