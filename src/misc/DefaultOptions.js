@@ -1,6 +1,7 @@
 export default {
   version: 3,
   clusterId: 'demo',
+  clusterDomain: null,
   apiKey: 'oCdCMcMPQpbvNjUIzqtvF1d2X2okWpDQj4AwARJuAgtjhzKxVEjQU6IdCjwm',
   consoleLogs: false,
   notifySelf: 0,
