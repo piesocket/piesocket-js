@@ -1,6 +1,6 @@
 {
   "name": "piesocket-js",
-  "version": "4.2.1",
+  "version": "4.2.2",
   "description": "PieSocket Javascript Client",
   "main": "src/index.js",
   "unpkg": "dist/piesocket.js",
