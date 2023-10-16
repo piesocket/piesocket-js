@@ -59,7 +59,8 @@ Complete list of allowed configuration options
 | Option                | Description                                     | Default  |
 | ----------------------------- | ----------------------------------------------------------------------------- | -------------- |
 | apiKey             | Required, Your PieSocket API key.                |  Demo key |
-| clusterId          | Required, Your API key's cluster ID.                       |  `demo` |
+| clusterId          | Your API key's cluster ID.                       |  `demo` |
+| clusterDomain          | Custom domain, if you have configured one in your account.                       |  `null` |
 | consoleLogs        | Logs useful connection info if set to `true`.                       |  `false` |
 | notifySelf        | Receive messages sent by self, pass `0` to disabled.                        |  `1` |
 | jwt        | JWT authentication token, skips authentication endpoint call.                        |  `null` |
