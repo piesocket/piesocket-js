@@ -1,6 +1,6 @@
 import Logger from './Logger.js';
-import Blockchain from './Blockchain';
-import Socket from './misc/WebSocket';
+import Blockchain from './Blockchain.js';
+import Socket from './misc/WebSocket.js';
 
 export default class Channel {
   constructor(endpoint, identity, init=true) {

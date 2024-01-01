@@ -1,2 +1,2 @@
-var RTCSessionDescription = RTCSessionDescription || {};
-export default RTCSessionDescription;
+var sessionDescription = RTCSessionDescription || {};
+export default sessionDescription;

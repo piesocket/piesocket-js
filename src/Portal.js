@@ -1,7 +1,7 @@
 import Logger from './Logger.js';
-import IceCandidate from './misc/RTCIceCandidate';
-import PeerConnection from './misc/RTCPeerConnection';
-import SessionDescription from './misc/RTCSessionDescription';
+import IceCandidate from './misc/RTCIceCandidate.js';
+import PeerConnection from './misc/RTCPeerConnection.js';
+import SessionDescription from './misc/RTCSessionDescription.js';
 const defaultPortalOptions = {
   shouldBroadcast: true,
   portal: true,
@@ -62,6 +62,7 @@ export default class Portal {
       return;
     }
 
+    console.log("peer connection", PeerConnection);
     const rtcConnection = new PeerConnection(this.peerConnectionConfig);
 
     rtcConnection.onicecandidate = (event) => {

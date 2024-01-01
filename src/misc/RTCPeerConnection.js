@@ -1,2 +1,2 @@
-var RTCPeerConnection = RTCPeerConnection || {}
-export default RTCPeerConnection;
+var peerConnection = RTCPeerConnection || {}
+export default peerConnection;

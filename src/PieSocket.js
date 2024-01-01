@@ -1,6 +1,6 @@
 import Channel from './Channel.js';
 import Logger from './Logger.js';
-import Portal from './Portal';
+import Portal from './Portal.js';
 import pjson from '../package.json';
 import InvalidAuthException from './InvalidAuthException.js';
 import defaultOptions from './misc/DefaultOptions.js';

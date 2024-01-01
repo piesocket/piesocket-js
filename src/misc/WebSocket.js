@@ -1,1 +1,2 @@
-export default WebSocket;
+var socket = WebSocket || {};
+export default socket;

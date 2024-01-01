@@ -1,2 +1,2 @@
-var RTCIceCandidate = RTCIceCandidate || {};
-export default RTCIceCandidate;
+var iceCandidate = RTCIceCandidate || {};
+export default iceCandidate;

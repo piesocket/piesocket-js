@@ -1,4 +1,4 @@
-module.exports = (api) => {
+var jestConfig = (api) => {
     // Cache configuration is a required option
     api.cache(false);
   
@@ -13,3 +13,5 @@ module.exports = (api) => {
   
     return { presets };
   };
+
+  export default jestConfig;
