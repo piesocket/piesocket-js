@@ -1,7 +1,7 @@
 {
   "name": "piesocket-js",
   "type":"module",
-  "version": "5.0.6",
+  "version": "5.0.7",
   "description": "PieSocket Javascript Client",
   "main": "src/index.js",
   "unpkg": "dist/piesocket.js",
@@ -9,6 +9,7 @@
     "test": "jest",
     "coverage": "jest --coverage",
     "lint": "eslint src --fix",
+
     "start": "NODE_ENV=development webpack serve --mode=development --config webpack.dev.js ",
     "build": "webpack --mode=production --config webpack.prod.js",
     "prepare": "npm run build",

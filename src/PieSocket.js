@@ -1,7 +1,7 @@
 import Channel from './Channel.js';
 import Logger from './Logger.js';
 import Portal from './Portal.js';
-import pjson from '../package.json';
+import pjson from "../package.json" assert { type: "json" };
 import InvalidAuthException from './InvalidAuthException.js';
 import defaultOptions from './misc/DefaultOptions.js';
 import {v4 as uuidv4} from 'uuid';
