@@ -32,7 +32,7 @@ import PieSocket from 'piesocket-js';
 With CDN/Browser:
 
 
-Use the `PieSocket` global variable
+Use the `PieSocket.default` global variable, e.g. `var piesocket = new PieSocket.default({...})`
 
 
 ## How To Use
