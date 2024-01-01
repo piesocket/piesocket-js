@@ -1,7 +1,6 @@
 import Channel from './Channel.js';
 import Logger from './Logger.js';
 import Portal from './Portal.js';
-import pjson from "../package.json" assert { type: "json" };
 import InvalidAuthException from './InvalidAuthException.js';
 import defaultOptions from './misc/DefaultOptions.js';
 import {v4 as uuidv4} from 'uuid';
@@ -117,7 +116,7 @@ export default class PieSocket {
 
   async getEndpoint(channelId, uuid) {
     let clusterDomain = this.options.clusterDomain == null ? `${this.options.clusterId}.piesocket.com`:this.options.clusterDomain;
-    let endpoint = `wss://${clusterDomain}/v${this.options.version}/${channelId}?api_key=${this.options.apiKey}&notify_self=${this.options.notifySelf}&source=jssdk&v=${pjson.version}&presence=${this.options.presence}`;
+    let endpoint = `wss://${clusterDomain}/v${this.options.version}/${channelId}?api_key=${this.options.apiKey}&notify_self=${this.options.notifySelf}&source=jssdk&v=5.0.8&presence=${this.options.presence}`;
 
     // Set auth
     if (this.options.jwt) {

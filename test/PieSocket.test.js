@@ -3,9 +3,8 @@ import PieSocket from '../src/PieSocket';
 import Logger from '../src/Logger';
 import DefaultOptions from '../src/misc/DefaultOptions';
 import Socket from '../src/misc/WebSocket';
-import module from '../package.json' assert { type: "json" };
 
-const currentVersion = module.version;
+const currentVersion = "5.0.8";
 const pieSocketProperties = ['options', 'connections', 'logger'];
 const channelProperties = ['events', 'listeners', "members", "portal", "uuid", "onSocketConnected", "onSocketError", 'endpoint', 'identity', 'connection', 'shouldReconnect', 'logger'];
 
