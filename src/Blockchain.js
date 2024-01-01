@@ -1,4 +1,4 @@
-import PieMessage from "./PieMessage.json" assert { type: "json" };
+const PieMessage = {};
 const BCMEndpoint = 'https://www.piesocket.com/api/blockchain/payloadHash';
 const PieMessageAddressDev = '0x2321c321828946153a845e69ee168f413e85c90d';
 const PieMessageAddressProd = '0x2a840CA40E082DbF24610B62a978900BfCaB23D3';
