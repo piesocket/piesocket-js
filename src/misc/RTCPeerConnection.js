@@ -1,2 +1,5 @@
-var peerConnection = RTCPeerConnection || {}
+var peerConnection = {}
+try {
+  peerConnection = RTCPeerConnection;
+} catch (e) {}
 export default peerConnection;

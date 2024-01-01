@@ -1,2 +1,5 @@
-var sessionDescription = RTCSessionDescription || {};
+var sessionDescription = {}
+try {
+  sessionDescription = RTCSessionDescription;
+} catch (e) {}
 export default sessionDescription;

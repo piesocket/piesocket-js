@@ -1,2 +1,5 @@
-var socket = WebSocket || {};
+var socket = {};
+try {
+  socket = WebSocket;
+} catch (e) {}
 export default socket;
