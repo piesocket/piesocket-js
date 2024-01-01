@@ -1,5 +1,6 @@
 {
   "name": "piesocket-js",
+  "type":"module",
   "version": "4.2.3",
   "description": "PieSocket Javascript Client",
   "main": "src/index.js",

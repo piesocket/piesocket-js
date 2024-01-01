@@ -1,6 +1,9 @@
-const path = require('path');
+import path from 'path';
+import { dirname } from "path";
+import { fileURLToPath } from "url";
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
-module.exports = {
+var common = {
     entry: './src/index.js',
     output: {
         path: path.resolve(__dirname, 'dist'),
@@ -8,3 +11,5 @@ module.exports = {
         library: 'PieSocket'
     }
 };
+
+export default common;
