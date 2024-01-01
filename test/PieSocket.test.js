@@ -3,7 +3,7 @@ import PieSocket from '../src/PieSocket';
 import Logger from '../src/Logger';
 import DefaultOptions from '../src/misc/DefaultOptions';
 import Socket from '../src/misc/WebSocket';
-const module = require('../package.json')
+import module from '../package.json' assert { type: "json" };
 
 const currentVersion = module.version;
 const pieSocketProperties = ['options', 'connections', 'logger'];
