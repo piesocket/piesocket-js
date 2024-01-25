@@ -19,6 +19,9 @@ export default class Portal {
     this.logger = new Logger(identity);
     this.identity = { ...defaultPortalOptions, ...identity };
     this.localStream = null;
+    this.senders = [];
+    this.cameraStream = null;
+    this.sharingScreen = false;
     this.peerConnectionConfig = {
       'iceServers': [
         { 'urls': 'stun:stun.stunprotocol.org:3478' },
@@ -93,12 +96,12 @@ export default class Portal {
 
     if (this.localStream) {
       this.localStream.getTracks().forEach((track) => {
-        rtcConnection.addTrack(track, this.localStream);
+        this.senders.push(rtcConnection.addTrack(track, this.localStream));
       });
     }
 
     this.isNegotiating[signal.from] = false;
-    
+
 
     rtcConnection.onnegotiationneeded = async () => {
       await this.sendVideoOffer(signal, rtcConnection, isCaller);
@@ -107,6 +110,51 @@ export default class Portal {
     this.participants[signal.from] = {
       rtc: rtcConnection,
     };
+  }
+
+  shareScreen() {
+    if(!this.sharingScreen){
+      navigator.mediaDevices.getDisplayMedia({ video: true })
+        .then(screenStream => {
+          const screenTrack = screenStream.getTracks()[0];
+          this.localStream = screenStream;
+
+          if (typeof this.identity.onLocalVideo == 'function') {
+            this.identity.onLocalVideo(screenStream, this);
+          }
+          this.sharingScreen = true;
+          for (const sender of this.senders) {
+            if (sender.track && sender.track.kind === 'video')
+              sender.replaceTrack(screenTrack);
+          }
+          alert("Screen sharing started! To stop, click on Stop Sharing button at the bottom!")
+
+          screenTrack.onended = () => {
+            this.localStream = this.cameraStream;
+            this.sharingScreen = false;
+            if (typeof this.identity.onLocalVideo == 'function') {
+              this.identity.onLocalVideo(this.cameraStream, this);
+            }
+            for (const sender of this.senders) {
+              if (sender.track && sender.track.kind === 'video') {
+                sender.replaceTrack(this.cameraStream.getTracks()[0]);
+              }
+            }
+          }
+        })
+        .catch(error => {
+          console.error('Error sharing screen:', error);
+          if (error.name === 'NotAllowedError') {
+            console.error('User denied permission for screen sharing.');
+          } else if (error.name === 'NotFoundError') {
+            console.error('Display media not found (possibly due to privacy settings).');
+          } else {
+            console.error('Unknown error during screen sharing:', error);
+          }
+        });
+    }else{
+      alert("You are already sharing screen!");
+    }
   }
 
   async sendVideoOffer(signal, rtcConnection, isCaller) {
@@ -188,6 +236,7 @@ export default class Portal {
      */
   getUserMediaSuccess(stream) {
     this.localStream = stream;
+    this.cameraStream = stream;
 
     if (typeof this.identity.onLocalVideo == 'function') {
       this.identity.onLocalVideo(stream, this);
@@ -198,7 +247,7 @@ export default class Portal {
 
   requestPeerVideo() {
     var eventName = 'system:portal_broadcaster';
-    
+
     if(!this.identity.shouldBroadcast){
       eventName = 'system:portal_watcher';
     }
