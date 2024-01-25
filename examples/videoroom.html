@@ -29,6 +29,26 @@
             padding-bottom: 5px;
             text-align: right;
         }
+
+        .btn-container {
+            text-align: center;
+        }
+
+        #btn {
+            background-color: #b19cd9;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        #btn:hover {
+            background-color: #9275a8;
+        }
+
     </style>
 </head>
 
@@ -86,7 +106,7 @@
             </div>
 
             <div class="bg-gray-50 pr-4 sm:pr-6 lg:pr-8 lg:flex-shrink-0 lg:border-l lg:border-gray-200 xl:pr-0">
-                <div class="h-full pl-6 py-6 lg:w-80">
+                <div class="h-full pl-6 py-6 lg:w-80 relative">
                     <!-- Start right column area -->
                     <div class="h-full relative" style="min-height: 16rem;">
                         <div class="absolute inset-0 p-4 border-2 border-gray-200 border-dashed rounded-lg">
@@ -95,9 +115,11 @@
                                 Members
                             </h3>
                             <ul id="members-list" role="list" class="overflow-scroll divide-y divide-gray-200">
-
+                                <!-- Member list items go here -->
                             </ul>
-
+                        </div>
+                        <div class="btn-container absolute bottom-4 left-1/2 transform -translate-x-1/2">
+                            <button id="btn" onclick="shareScreenBtn()">Share Screen</button>
                         </div>
                     </div>
                     <!-- End right column area -->
@@ -270,6 +292,13 @@
                 refreshMembersList();
             });
         })
+        function shareScreenBtn(){
+            if(channel){
+                channel.portal.shareScreen();
+            }else{
+                alert("Channel not setup yet. Please Wait!");
+            }
+        }
     </script>
 </body>
 
