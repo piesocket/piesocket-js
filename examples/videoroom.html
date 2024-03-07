@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Realtime Chatroom - PieSocket Channels</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com" defer></script>
     <script src="/dist/piesocket.js"></script>
     <style>
         video {
@@ -56,6 +56,8 @@
 
 
         </nav>
+
+        <button onclick="shareScreen()">Share screen</button>
 
         <!-- 3 column wrapper -->
         <div class="flex-grow w-full max-w-7xl mx-auto xl:px-8 lg:flex">
@@ -164,7 +166,7 @@
     </div>
 
     <script>
-        username = window.location.hash.replace("#","");
+        username = window.location.hash.replace("#", "");
         console.log(username);
         if (!username) {
             username = prompt("Enter username");
@@ -270,6 +272,10 @@
                 refreshMembersList();
             });
         })
+
+        function shareScreen() {
+            channel.portal.shareScreen();            
+        }
     </script>
 </body>
 
