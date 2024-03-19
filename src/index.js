@@ -1,2 +1,2 @@
-import PieSocket from "./PieSocket.js"
+import PieSocket from './PieSocket.js';
 export default PieSocket;

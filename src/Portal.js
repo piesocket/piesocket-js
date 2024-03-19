@@ -6,23 +6,27 @@ const defaultPortalOptions = {
   shouldBroadcast: true,
   portal: true,
   video: false,
-  audio: true
+  audio: true,
 };
 
 export default class Portal {
   /**
-     * Creates a video room instance
-     * @param {*} channel
-     */
+   * Creates a video room instance
+   * @param {*} channel
+   * @param {*} identity
+   *
+   * @return {void} Returns an instance of the Portal
+   */
   constructor(channel, identity) {
     this.channel = channel;
     this.logger = new Logger(identity);
-    this.identity = { ...defaultPortalOptions, ...identity };
+    this.identity = {...defaultPortalOptions, ...identity};
     this.localStream = null;
+    this.displayStream = null;
     this.peerConnectionConfig = {
-      'iceServers': [
-        { 'urls': 'stun:stun.stunprotocol.org:3478' },
-        { 'urls': 'stun:stun.l.google.com:19302' },
+      iceServers: [
+        {urls: 'stun:stun.stunprotocol.org:3478'},
+        {urls: 'stun:stun.l.google.com:19302'},
       ],
     };
     this.constraints = {
@@ -33,22 +37,28 @@ export default class Portal {
     this.participants = [];
     this.isNegotiating = [];
 
-
     this.logger.log('Initializing video room');
     this.init();
   }
 
   /**
-     * Initialize local video
-     */
+   * Initialize local video
+   * @return {void}
+   */
   init() {
     if (!this.constraints.video && !this.constraints.audio) {
       this.requestPeerVideo();
       return;
     }
 
-    if (typeof navigator != 'undefined' && navigator.mediaDevices.getUserMedia) {
-      navigator.mediaDevices.getUserMedia(this.constraints).then(this.getUserMediaSuccess.bind(this)).catch(this.errorHandler.bind(this));
+    if (
+      typeof navigator != 'undefined' &&
+      navigator.mediaDevices.getUserMedia
+    ) {
+      navigator.mediaDevices
+          .getUserMedia(this.constraints)
+          .then(this.getUserMediaSuccess.bind(this))
+          .catch(this.errorHandler.bind(this));
       return true;
     } else {
       this.logger.error('Your browser does not support getUserMedia API');
@@ -58,19 +68,18 @@ export default class Portal {
 
   shareVideo(signal, isCaller = true) {
     if (!this.identity.shouldBroadcast && isCaller && !signal.isBroadcasting) {
-      console.log("Refusing to call, denied broadcast request");
+      console.log('Refusing to call, denied broadcast request');
       return;
     }
 
-    console.log("peer connection", PeerConnection);
     const rtcConnection = new PeerConnection(this.peerConnectionConfig);
 
     rtcConnection.onicecandidate = (event) => {
       if (event.candidate != null) {
         this.channel.publish('system:portal_candidate', {
-          'from': this.channel.uuid,
-          'to': signal.from,
-          'ice': event.candidate,
+          from: this.channel.uuid,
+          to: signal.from,
+          ice: event.candidate,
         });
       }
     };
@@ -88,7 +97,8 @@ export default class Portal {
 
     rtcConnection.onsignalingstatechange = (e) => {
       // Workaround for Chrome: skip nested negotiations
-      this.isNegotiating[signal.from] = (rtcConnection.signalingState != 'stable');
+      this.isNegotiating[signal.from] =
+        rtcConnection.signalingState != 'stable';
     };
 
     if (this.localStream) {
@@ -97,8 +107,13 @@ export default class Portal {
       });
     }
 
+    if (this.displayStream) {
+      this.displayStream.getTracks().forEach((track) => {
+        rtcConnection.addTrack(track, this.displayStream);
+      });
+    }
+
     this.isNegotiating[signal.from] = false;
-    
 
     rtcConnection.onnegotiationneeded = async () => {
       await this.sendVideoOffer(signal, rtcConnection, isCaller);
@@ -109,12 +124,46 @@ export default class Portal {
     };
   }
 
-  async sendVideoOffer(signal, rtcConnection, isCaller) {
-
-    if (!isCaller) {
-      return;
+  async onRemoteScreenStopped(uuid, streamId) {
+    if (typeof this.identity.onScreenSharingStopped == 'function') {
+      this.identity.onScreenSharingStopped(uuid, streamId);
     }
+  }
 
+  async onLocalScreen(screenStream) {
+    // Register stop handler
+    screenStream.getVideoTracks()[0].addEventListener('ended', () => {
+      this.channel.publish('system:stopped_screen', {
+        from: this.channel.uuid,
+        streamId: screenStream.id,
+      });
+    });
+
+    // Send it to other peers
+    this.displayStream = screenStream;
+    const participants = this.participants;
+
+    const participantsIds = Object.keys(participants);
+    participantsIds.forEach((id) => {
+      const rtc = participants[id].rtc;
+      screenStream.getTracks().forEach((track) => {
+        rtc.addTrack(track, screenStream);
+      });
+    });
+  }
+
+  async shareScreen() {
+    navigator.mediaDevices
+        .getDisplayMedia()
+        .then(this.onLocalScreen.bind(this))
+        .catch(this.errorHandler.bind(this));
+  }
+
+  async sendVideoOffer(signal, rtcConnection, isCaller) {
+    // if (!isCaller) {
+    //   console.log("Skipped, not the caller");
+    //   return;
+    // }
 
     if (this.isNegotiating[signal.from]) {
       console.log('SKIP nested negotiations');
@@ -123,18 +172,16 @@ export default class Portal {
 
     this.isNegotiating[signal.from] = true;
 
-
     const description = await rtcConnection.createOffer();
     await rtcConnection.setLocalDescription(description);
 
     console.log('Making offer');
     // Send a call offer
     this.channel.publish('system:video_offer', {
-      'from': this.channel.uuid,
-      'to': signal.from,
-      'sdp': rtcConnection.localDescription,
+      from: this.channel.uuid,
+      to: signal.from,
+      sdp: rtcConnection.localDescription,
     });
-
   }
 
   removeParticipant(uuid) {
@@ -152,22 +199,31 @@ export default class Portal {
 
   createAnswer(signal) {
     return new Promise(async (resolve, reject) => {
-      if (!this.participants[signal.from] || !this.participants[signal.from].rtc) {
+      if (
+        !this.participants[signal.from] ||
+        !this.participants[signal.from].rtc
+      ) {
         console.log('Starting call in createAnswer');
         this.shareVideo(signal, false);
       }
 
-      await this.participants[signal.from].rtc.setRemoteDescription(new SessionDescription(signal.sdp));
+      await this.participants[signal.from].rtc.setRemoteDescription(
+          new SessionDescription(signal.sdp),
+      );
       // Only create answers in response to offers
       if (signal.sdp.type == 'offer') {
         this.logger.log('Got an offer from ' + signal.from, signal);
-        const description = await this.participants[signal.from].rtc.createAnswer();
+        const description = await this.participants[
+            signal.from
+        ].rtc.createAnswer();
 
-        await this.participants[signal.from].rtc.setLocalDescription(description);
+        await this.participants[signal.from].rtc.setLocalDescription(
+            description,
+        );
         this.channel.publish('system:video_answer', {
-          'from': this.channel.uuid,
-          'to': signal.from,
-          'sdp': this.participants[signal.from].rtc.localDescription,
+          from: this.channel.uuid,
+          to: signal.from,
+          sdp: this.participants[signal.from].rtc.localDescription,
         });
         resolve();
       } else {
@@ -178,14 +234,16 @@ export default class Portal {
     });
   }
 
-  handleAnswer(signal){
-    this.participants[signal.from].rtc.setRemoteDescription(new SessionDescription(signal.sdp));
+  handleAnswer(signal) {
+    this.participants[signal.from].rtc.setRemoteDescription(
+        new SessionDescription(signal.sdp),
+    );
   }
 
   /**
-     * Callback to handle local stream
-     * @param {*} stream
-     */
+   * Callback to handle local stream
+   * @param {*} stream
+   */
   getUserMediaSuccess(stream) {
     this.localStream = stream;
 
@@ -197,22 +255,22 @@ export default class Portal {
   }
 
   requestPeerVideo() {
-    var eventName = 'system:portal_broadcaster';
-    
-    if(!this.identity.shouldBroadcast){
+    let eventName = 'system:portal_broadcaster';
+
+    if (!this.identity.shouldBroadcast) {
       eventName = 'system:portal_watcher';
     }
 
     this.channel.publish(eventName, {
       from: this.channel.uuid,
-      isBroadcasting: this.identity.shouldBroadcast
+      isBroadcasting: this.identity.shouldBroadcast,
     });
   }
 
-  requestOfferFromPeer(){
-    this.channel.publish("system:video_request", {
+  requestOfferFromPeer() {
+    this.channel.publish('system:video_request', {
       from: this.channel.uuid,
-      isBroadcasting: this.identity.shouldBroadcast
+      isBroadcasting: this.identity.shouldBroadcast,
     });
   }
 

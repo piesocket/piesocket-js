@@ -1,0 +1,17 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
+  "extends": ["google"],
+  "parserOptions": {
+    "ecmaVersion": 13,
+    "sourceType": "module"
+  },
+  "rules": {
+    "require-jsdoc": "off", //TODO: turn it on
+    "max-len": ["error", 210],
+    "prefer-promise-reject-errors": "off",
+    "no-invalid-this": "off"
+  }
+}

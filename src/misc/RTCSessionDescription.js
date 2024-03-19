@@ -1,4 +1,4 @@
-var sessionDescription = {}
+let sessionDescription = {};
 try {
   sessionDescription = RTCSessionDescription;
 } catch (e) {}
