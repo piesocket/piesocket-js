@@ -125,7 +125,22 @@ export default class Portal {
     };
   }
 
+  async onRemoteScreenStopped(uuid, streamId) {
+    if (typeof this.identity.onScreenSharingStopped == 'function') {
+      this.identity.onScreenSharingStopped(uuid, streamId);
+    }
+  }
+
   async onLocalScreen(screenStream) {
+    // Register stop handler
+    screenStream.getVideoTracks()[0].addEventListener('ended', () => {
+      this.channel.publish('system:stopped_screen', {
+        from: this.channel.uuid,
+        streamId: screenStream.id,
+      });
+    });
+
+    // Send it to other peers
     this.displayStream = screenStream;
     const participants = this.participants;
 

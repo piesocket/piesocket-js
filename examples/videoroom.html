@@ -57,7 +57,6 @@
 
         </nav>
 
-        <button onclick="shareScreen()">Share screen</button>
 
         <!-- 3 column wrapper -->
         <div class="flex-grow w-full max-w-7xl mx-auto xl:px-8 lg:flex">
@@ -66,6 +65,11 @@
 
                 <div class="bg-white lg:min-w-0 lg:flex-1">
                     <div class="h-full py-6 px-4 sm:px-6 lg:px-8">
+                        <button onclick="shareScreen()" type="button"
+                            class="rounded-md mb-2 bg-white px-3.5 py-2.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                        Share screen
+                        </button>
+
                         <!-- Start main area-->
                         <div class="relative h-full" style="min-height: 36rem;">
                             <div id="chat-room-container"
@@ -239,8 +243,8 @@
                 var member = channel.getMemberByUUID(uuid);
 
                 var videoContainer = document.createElement("div");
-                videoContainer.classList = "video-container";
-                videoContainer.id = uuid;
+                videoContainer.classList = `video-container ${uuid}`;
+                videoContainer.id = stream.id;
 
                 var videoHolder = document.createElement("video");
                 videoHolder.setAttribute("autoplay", true);
@@ -253,9 +257,19 @@
                 videoContainer.append(videoCaption);
 
                 document.getElementById("video-room").append(videoContainer);
+
+
             },
             onParticipantLeft: (uuid) => {
-                document.getElementById(uuid).remove();
+                var streams = document.getElementsByClassName(uuid);
+                console.log(`Removing ${streams.length} streams from user who left`);
+
+                while (streams.length > 0) {
+                    streams[0].remove();
+                }
+            },
+            onScreenSharingStopped: (uuid, streamId) => {
+                document.getElementById(streamId).remove();
             }
         }).then(ch => {
             window.channel = ch;
@@ -274,7 +288,7 @@
         })
 
         function shareScreen() {
-            channel.portal.shareScreen();            
+            channel.portal.shareScreen();
         }
     </script>
 </body>

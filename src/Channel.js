@@ -179,6 +179,8 @@ export default class Channel {
       }
     } else if (message.event == 'system:portal_broadcaster' && message.data.from != this.uuid) {
       this.portal.requestOfferFromPeer(message.data);
+    } else if (message.event == 'system:stopped_screen' && message.data.from != this.uuid) {
+      this.portal.onRemoteScreenStopped(message.data.from, message.data.streamId);
     } else if (message.event == 'system:portal_watcher' && message.data.from != this.uuid) {
       this.portal.shareVideo(message.data);
     } else if (message.event == 'system:video_request' && message.data.from != this.uuid) {
