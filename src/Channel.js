@@ -177,16 +177,13 @@ export default class Channel {
       if (this.portal) {
         this.portal.removeParticipant(message.data.member.uuid);
       }
-    }
-    else if (message.event == 'system:portal_broadcaster' && message.data.from != this.uuid) {
+    } else if (message.event == 'system:portal_broadcaster' && message.data.from != this.uuid) {
       this.portal.requestOfferFromPeer(message.data);
-    } 
-    else if (message.event == 'system:portal_watcher' && message.data.from != this.uuid) {
+    } else if (message.event == 'system:portal_watcher' && message.data.from != this.uuid) {
       this.portal.shareVideo(message.data);
-    }else if (message.event == 'system:video_request' && message.data.from != this.uuid) {
+    } else if (message.event == 'system:video_request' && message.data.from != this.uuid) {
       this.portal.shareVideo(message.data);
-    } 
-    else if (message.event == 'system:portal_candidate' && message.data.to == this.uuid) {
+    } else if (message.event == 'system:portal_candidate' && message.data.to == this.uuid) {
       this.portal.addIceCandidate(message.data);
     } else if (message.event == 'system:video_offer' && message.data.to == this.uuid) {
       this.portal.createAnswer(message.data);

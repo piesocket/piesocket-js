@@ -1,4 +1,4 @@
-var socket = {};
+let socket = {};
 try {
   socket = WebSocket;
 } catch (e) {}

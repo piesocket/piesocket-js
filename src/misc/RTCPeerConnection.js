@@ -1,4 +1,4 @@
-var peerConnection = {}
+let peerConnection = {};
 try {
   peerConnection = RTCPeerConnection;
 } catch (e) {}
