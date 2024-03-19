@@ -72,7 +72,6 @@ export default class Portal {
       return;
     }
 
-    console.log('peer connection', PeerConnection);
     const rtcConnection = new PeerConnection(this.peerConnectionConfig);
 
     rtcConnection.onicecandidate = (event) => {
