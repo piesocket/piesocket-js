@@ -1,8 +1,8 @@
 {
   "name": "piesocket-js",
   "type":"module",
-  "version": "5.1.0",
-  "description": "PieSocket Javascript Client",
+  "version": "5.2.0",
+  "description": "PieSocket Realtime Client",
   "main": "src/index.js",
   "unpkg": "dist/piesocket.js",
   "scripts": {

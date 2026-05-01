@@ -225,9 +225,10 @@
 		/* Functions End */
 
 		//Initialize PieSocket
-		var piesocket = new PieSocket({
-			clusterId: 'demo',
-			apiKey: 'wDouy4TMvN5Qw4SkhmZ35skbCBKnlv0fDqKQfhmp',
+		var piesocket = new PieSocket.default({
+			clusterDomain: 'localhost:4001',
+			ssl: false,
+			apiKey: 'testkey',
 			consoleLogs: true,
 			notifySelf: true,
 			presence: true,

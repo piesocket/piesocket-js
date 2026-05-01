@@ -4,7 +4,7 @@ import Logger from '../src/Logger';
 import DefaultOptions from '../src/misc/DefaultOptions';
 import Socket from '../src/misc/WebSocket';
 
-const currentVersion = "5.0.8";
+const currentVersion = "5.2.0";
 const pieSocketProperties = ['options', 'connections', 'logger'];
 const channelProperties = ['events', 'listeners', "members", "portal", "uuid", "onSocketConnected", "onSocketError", 'endpoint', 'identity', 'connection', 'shouldReconnect', 'logger'];
 
