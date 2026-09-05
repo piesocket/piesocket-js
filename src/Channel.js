@@ -8,6 +8,7 @@ export default class Channel {
     this.listeners = {};
     this.members = [];
     this.portal = null;
+    this.pieRTC = null;
     this.uuid = null;
     this.onSocketConnected = () => {};
     this.onSocketError = () => {};
@@ -251,7 +252,9 @@ export default class Channel {
     // member that changed, and the full roster arrives once as member_list (on
     // join or in response to system::get_members / refreshMembers()). v4's
     // system events are double-colon (`system::x`) end-to-end; v3's stay
-    // single-colon. Portal/WebRTC events below are always v3, so untouched.
+    // single-colon. Portal (v3 WebRTC) events below stay single-colon `system:`;
+    // PieRTC (v4 WebRTC) uses its own `rtc::` namespace so it never collides
+    // with either system event convention.
     const deltaPresence = this.identity && this.identity.version == 4;
     const memberListEvent = deltaPresence ? 'system::member_list' : 'system:member_list';
     const memberJoinedEvent = deltaPresence ? 'system::member_joined' : 'system:member_joined';
@@ -274,6 +277,9 @@ export default class Channel {
       if (this.portal && message.data.member) {
         this.portal.removeParticipant(message.data.member.uuid);
       }
+      if (this.pieRTC && message.data.member) {
+        this.pieRTC.removeParticipant(message.data.member.uuid);
+      }
     } else if (message.event == 'system:portal_broadcaster' && message.data.from != this.uuid) {
       this.portal.requestOfferFromPeer(message.data);
     } else if (message.event == 'system:stopped_screen' && message.data.from != this.uuid) {
@@ -288,6 +294,20 @@ export default class Channel {
       this.portal.createAnswer(message.data);
     } else if (message.event == 'system:video_answer' && message.data.to == this.uuid) {
       this.portal.handleAnswer(message.data);
+    } else if (message.event == 'rtc::broadcaster' && message.data.from != this.uuid) {
+      this.pieRTC.requestOfferFromPeer(message.data);
+    } else if (message.event == 'rtc::stopped_screen' && message.data.from != this.uuid) {
+      this.pieRTC.onRemoteScreenStopped(message.data.from, message.data.streamId);
+    } else if (message.event == 'rtc::watcher' && message.data.from != this.uuid) {
+      this.pieRTC.shareVideo(message.data);
+    } else if (message.event == 'rtc::request' && message.data.from != this.uuid) {
+      this.pieRTC.shareVideo(message.data);
+    } else if (message.event == 'rtc::candidate' && message.data.to == this.uuid) {
+      this.pieRTC.addIceCandidate(message.data);
+    } else if (message.event == 'rtc::offer' && message.data.to == this.uuid) {
+      this.pieRTC.createAnswer(message.data);
+    } else if (message.event == 'rtc::answer' && message.data.to == this.uuid) {
+      this.pieRTC.handleAnswer(message.data);
     }
   }
 

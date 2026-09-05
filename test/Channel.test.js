@@ -83,8 +83,8 @@ jest.mock('../src/misc/WebSocket.js', () => {
   });
 });
 
-const channelProperties = ['events', 'listeners', 'members', 'portal', 'uuid', 'onSocketConnected', 'onSocketError', 'endpoint', 'identity', 'connection', 'shouldReconnect', 'logger'];
-const uninitializedChannelProperties = ['events', 'listeners', 'members', 'portal', 'uuid', 'onSocketConnected', 'onSocketError'];
+const channelProperties = ['events', 'listeners', 'members', 'portal', 'pieRTC', 'uuid', 'onSocketConnected', 'onSocketError', 'endpoint', 'identity', 'connection', 'shouldReconnect', 'logger'];
+const uninitializedChannelProperties = ['events', 'listeners', 'members', 'portal', 'pieRTC', 'uuid', 'onSocketConnected', 'onSocketError'];
 
 describe('Channel', function () {
 
@@ -114,7 +114,7 @@ describe('Channel', function () {
     uninitializedChannel.init(piesocket.getEndpoint("test"), piesocket.options);
     
     const propsAfterInit = Object.keys(uninitializedChannel);
-    propsAfterInit.splice(7,1); //remove connect property added by spy
+    propsAfterInit.splice(8,1); //remove connect property added by spy
     expect(propsAfterInit).toEqual(channelProperties);
 
     expect(connectSpy).toHaveBeenCalled()

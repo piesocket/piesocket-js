@@ -221,7 +221,8 @@
             consoleLogs: true,
             notifySelf: true,
             presence: true,
-            userId: username
+            userId: username,
+            version: 4
         });
 
         piesocket.subscribe("video-chat-channel", {
@@ -264,11 +265,12 @@
                 addMessage(meta.from, data.message);
             });
 
-            channel.listen("system:member_joined", function (data, meta) {
+            // v4 presence events are double-colon (system::x), not v3's system:x.
+            channel.listen("system::member_joined", function (data, meta) {
                 refreshMembersList();
             });
 
-            channel.listen("system:member_left", function (data, meta) {
+            channel.listen("system::member_left", function (data, meta) {
                 refreshMembersList();
             });
         })

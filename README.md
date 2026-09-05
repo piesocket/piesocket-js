@@ -4,6 +4,8 @@ A JavaScript Library for PieSocket Realtime.
 
 Note: This package is PieSocket Client SDK (to be used with frontend on browsers), if you are looking for the NodeJS Server SDK, please see [PieSocket-NodeJS](https://github.com/piesocket/piesocket-nodejs).
 
+See [CHANGELOG.md](CHANGELOG.md) for release notes.
+
 ## Installation
 
 Yarn
@@ -36,7 +38,7 @@ Use the `PieSocket.default` global variable, e.g. `var piesocket = new PieSocket
 
 
 ## How To Use
-PieSocketJS offers Channels and Portals.
+PieSocketJS offers Channels, Portals (v3) and PieRTC (v4).
 
 ### Channels
 Channels are realtime PubSub connections over WebSocket, they allow you to:
@@ -76,12 +78,45 @@ Notes for v4:
 - **Unsubscribing the connect-time channel** promotes another subscribed
   channel to keep the connection alive; a few in-flight frames may be missed
   during the swap.
-- **Portals/video** always use the v3 protocol, even when `version: 4` is set.
+- **Video/audio rooms** (`subscribe(channel, {video: true})` etc.) ride the
+  same shared connection as everything else under `version: 4` — see
+  [PieRTC](#piertc-v4) below.
 
 ### Portals
-Portals are programmable video streams over WebRTC, they allow you to build powerful video applications.
+Portals are programmable video streams over WebRTC (v3), they allow you to build powerful video applications.
 
 See the [Portals documentation](https://www.piesocket.com/docs/3.0/portals) to learn more about how to use Portals.
+
+### PieRTC (v4)
+PieRTC is the v4 counterpart to Portals: the same programmable WebRTC video/audio
+rooms, but multiplexed onto v4's shared connection instead of a dedicated socket
+per room.
+
+```javascript
+const piesocket = new PieSocket({ version: 4, notifySelf: true, clusterId: 'xxxxx', apiKey: 'yyyyy' });
+
+const room = await piesocket.subscribe('video-room', {
+  video: true,
+  onLocalVideo: (stream) => { /* attach to a <video> element */ },
+  onParticipantJoined: (uuid, stream) => { /* attach remote stream */ },
+  onParticipantLeft: (uuid) => { /* remove remote stream */ },
+});
+```
+
+Notes:
+
+- Pass `video: true`, `audio: true`, or `portal: true` in `subscribe()`'s
+  second argument to mark a room as a PieRTC room — the channel is attached a
+  `.pieRTC` instance once subscribed.
+- Signalling frames use their own `rtc::` namespace (`rtc::offer`,
+  `rtc::answer`, `rtc::candidate`, etc.) — separate from both v3's `system:`
+  and v4's `system::` conventions, so they're never mistaken for control
+  frames.
+- **Set `notifySelf: true`** on the `PieSocket` constructor if this is the
+  first `subscribe()` call (it opens the shared connection) — PieRTC relies
+  on it the same way v3 Portals do. If a PieRTC room is subscribed onto a
+  socket that's already open without it, a console warning is logged since
+  it can't be changed after the fact.
 
 ## Configuration
 Complete list of allowed configuration options

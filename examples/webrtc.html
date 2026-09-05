@@ -26,7 +26,8 @@
             clusterId: 's3419.sgp1',
             apiKey: '8WTWMYT5piRV0Dn19iLAIRazwG5PNsuiyHwNZNkY',
             consoleLogs: false,
-            jwt:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJwcmVzZW5jZS12aWRlby1yb29tIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJ1c2VyIjp7Im5hbWUiOiJBbmFuZCJ9fQ.9hwl5ElPTqLeYp1gZBQmSxx_xNi48BskOfPYLAM6eUs"
+            jwt:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJwcmVzZW5jZS12aWRlby1yb29tIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJ1c2VyIjp7Im5hbWUiOiJBbmFuZCJ9fQ.9hwl5ElPTqLeYp1gZBQmSxx_xNi48BskOfPYLAM6eUs",
+            version: 4
         });
 
         piesocket.subscribe("presence-video-room",{
@@ -52,19 +53,21 @@
             //Channel connection ready
             console.log("PieSocket channel connected");
 
-            channel.listen("system:member_list", (members)=> {
+            // v4 events are double-colon (system::x) end-to-end; PieRTC's own
+            // signalling uses its own rtc:: namespace instead of v3's system:video_*.
+            channel.listen("system::member_list", (members)=> {
                 console.log("Fetched members list", channel.members);
             })
 
-            channel.listen("system:member_joined", (member)=> {
+            channel.listen("system::member_joined", (member)=> {
                 console.log("New member joined", channel.members);
             })
 
-            channel.listen("system:video_request", (data)=> {
+            channel.listen("rtc::request", (data)=> {
                 console.log("New video request", data, channel.members);
-            })            
+            })
 
-            channel.listen("system:member_left", (data)=> {
+            channel.listen("system::member_left", (data)=> {
                 console.log("New member left", data.member, data.members);
             })
         });

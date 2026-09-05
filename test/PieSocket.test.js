@@ -3,10 +3,14 @@ import PieSocket from '../src/PieSocket';
 import Logger from '../src/Logger';
 import DefaultOptions from '../src/misc/DefaultOptions';
 import Socket from '../src/misc/WebSocket';
+import pkg from '../package.json';
 
-const currentVersion = "5.4.0";
+// Read from package.json instead of hardcoding, so this never drifts from
+// the SDK_VERSION src/PieSocket.js's own build step keeps in sync (see
+// scripts/sync-version.js).
+const currentVersion = pkg.version;
 const pieSocketProperties = ['options', 'connections', 'logger'];
-const channelProperties = ['events', 'listeners', "members", "portal", "uuid", "onSocketConnected", "onSocketError", 'endpoint', 'identity', 'connection', 'shouldReconnect', 'logger'];
+const channelProperties = ['events', 'listeners', "members", "portal", "pieRTC", "uuid", "onSocketConnected", "onSocketError", 'endpoint', 'identity', 'connection', 'shouldReconnect', 'logger'];
 
 //Mocks
 const mockAddIceCandidate = jest.fn();

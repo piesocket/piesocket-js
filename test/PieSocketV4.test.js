@@ -167,18 +167,71 @@ describe('PieSocket v4 — shared connection', () => {
     expect(piesocket.getConnections()['room-1']).toBeUndefined();
   });
 
-  it('portal rooms fall back to a dedicated v3 socket', async () => {
+  it('portal rooms ride the shared v4 socket and get a PieRTC attached', async () => {
     const piesocket = newClient();
     const pending = piesocket.subscribe('video-room', {audio: true});
     await flush();
 
-    expect(lastSocket().endpoint).toContain('/v3/video-room?');
+    expect(mockSockets.length).toBe(1);
+    expect(lastSocket().endpoint).toContain('/v4/video-room?');
 
-    // The identity's version must match the v3 socket actually used, or
-    // Channel's delta-presence logic listens for v4's double-colon member
-    // events on a socket that only ever sends v3's single-colon ones.
     lastSocket().onopen({});
     const channel = await pending;
-    expect(channel.identity.version).toBe(3);
+    expect(channel.channelId).toBe('video-room');
+    expect(channel.pieRTC).toBeTruthy();
+    // Mirrors v3 Portal's forced notifySelf so peers' own signalling can echo back.
+    expect(piesocket.options.notifySelf).toBe(true);
+  });
+
+  it('a second portal room subscribed onto an already-open socket also gets PieRTC', async () => {
+    const piesocket = newClient();
+    const p1 = piesocket.subscribe('room-1');
+    await flush();
+    lastSocket().onopen({});
+    await p1;
+
+    const p2 = piesocket.subscribe('video-room-2', {video: true});
+    await flush();
+    lastSocket().onmessage({
+      data: JSON.stringify({event: 'system::subscribe_success', data: {channel: 'video-room-2'}}),
+    });
+    const channel = await p2;
+
+    expect(channel.channelId).toBe('video-room-2');
+    expect(channel.pieRTC).toBeTruthy();
+  });
+});
+
+describe('PieSocket v4 — SSR / no WebSocket global', () => {
+  // The file-level beforeAll above sets a global.WebSocket for every test in
+  // this file; undo it here to mirror a real SSR/Node environment, where
+  // PieRTC must not be constructed since its constructor calls getUserMedia().
+  beforeAll(() => {
+    delete global.WebSocket;
+  });
+  afterAll(() => {
+    global.WebSocket = function() {};
+  });
+
+  const newClient = () => new PieSocket({
+    version: 4, clusterId: 'nyc1', apiKey: 'xxx', notifySelf: 0,
+  });
+
+  it('does not construct PieRTC for a portal room when there is no WebSocket global', async () => {
+    const piesocket = newClient();
+    const channel = await piesocket.subscribe('video-room', {video: true});
+
+    expect(channel.channelId).toBe('video-room');
+    expect(channel.pieRTC).toBeFalsy();
+  });
+
+  it('does not construct PieRTC for a second portal room joining an existing SSR connection', async () => {
+    const piesocket = newClient();
+    await piesocket.subscribe('room-1');
+
+    const channel = await piesocket.subscribe('video-room-2', {audio: true});
+
+    expect(channel.channelId).toBe('video-room-2');
+    expect(channel.pieRTC).toBeFalsy();
   });
 });

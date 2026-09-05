@@ -88,3 +88,49 @@ describe('Channel — v4 send path', () => {
     await expect(channel.refreshMembers()).resolves.toEqual([{uuid: 'z'}]);
   });
 });
+
+describe('Channel — v4 PieRTC dispatch', () => {
+  const makePieRTCChannel = () => {
+    const channel = makeV4Channel();
+    channel.pieRTC = {
+      requestOfferFromPeer: jest.fn(),
+      onRemoteScreenStopped: jest.fn(),
+      shareVideo: jest.fn(),
+      addIceCandidate: jest.fn(),
+      createAnswer: jest.fn(),
+      handleAnswer: jest.fn(),
+      removeParticipant: jest.fn(),
+    };
+    return channel;
+  };
+
+  it('routes rtc::broadcaster from a peer to requestOfferFromPeer', () => {
+    const channel = makePieRTCChannel();
+    channel.handleFrame(frame('rtc::broadcaster', {from: 'peer-1'}));
+    expect(channel.pieRTC.requestOfferFromPeer).toHaveBeenCalledWith({from: 'peer-1'});
+  });
+
+  it('ignores rtc::broadcaster echoed back from itself', () => {
+    const channel = makePieRTCChannel();
+    channel.handleFrame(frame('rtc::broadcaster', {from: 'me'}));
+    expect(channel.pieRTC.requestOfferFromPeer).not.toHaveBeenCalled();
+  });
+
+  it('routes rtc::offer addressed to this uuid to createAnswer', () => {
+    const channel = makePieRTCChannel();
+    channel.handleFrame(frame('rtc::offer', {from: 'peer-1', to: 'me', sdp: {}}));
+    expect(channel.pieRTC.createAnswer).toHaveBeenCalledWith({from: 'peer-1', to: 'me', sdp: {}});
+  });
+
+  it('routes rtc::candidate addressed to this uuid to addIceCandidate', () => {
+    const channel = makePieRTCChannel();
+    channel.handleFrame(frame('rtc::candidate', {from: 'peer-1', to: 'me', ice: {}}));
+    expect(channel.pieRTC.addIceCandidate).toHaveBeenCalled();
+  });
+
+  it('removes the PieRTC participant on system::member_left', () => {
+    const channel = makePieRTCChannel();
+    channel.handleFrame(frame('system::member_left', {member: {uuid: 'peer-1'}, count: 0}));
+    expect(channel.pieRTC.removeParticipant).toHaveBeenCalledWith('peer-1');
+  });
+});

@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Realtime Chatroom - PieSocket Channels</title>
+    <title>PieRTC (v4) - PieSocket Channels</title>
     <script src="https://cdn.tailwindcss.com" defer></script>
     <script src="/dist/piesocket.js"></script>
     <style>
@@ -53,10 +53,7 @@
 
                 </div>
             </div>
-
-
         </nav>
-
 
         <!-- 3 column wrapper -->
         <div class="flex-grow w-full max-w-7xl mx-auto xl:px-8 lg:flex">
@@ -113,49 +110,6 @@
     </div>
 
     <div style="display: none;">
-        <div id="chat-message-component">
-            <li>
-                <div class="relative pb-8">
-                    <div class="relative flex items-start space-x-3">
-                        <div class="relative">
-                            <img id="chat-sender-avatar"
-                                class="h-10 w-10 rounded-full bg-gray-400 flex items-center justify-center ring-8 ring-white"
-                                src="https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?ixlib=rb-=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=8&w=256&h=256&q=80"
-                                alt="">
-
-                            <span class="absolute -bottom-0.5 -right-1 bg-white rounded-tl px-0.5 py-px">
-                                <!-- Heroicon name: solid/chat-alt -->
-                                <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                    <path fill-rule="evenodd"
-                                        d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zM7 8H5v2h2V8zm2 0h2v2H9V8zm6 0h-2v2h2V8z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                            </span>
-                        </div>
-                        <div class="min-w-0 flex-1">
-                            <div>
-                                <div class="text-sm">
-                                    <a href="#" id="chat-sender" class="font-medium text-gray-900"></a>
-                                </div>
-                                <p id="chat-action" class="mt-0.5 text-sm text-gray-500">
-                                    Wrote
-                                </p>
-                            </div>
-                            <div class="mt-2 text-sm text-gray-700">
-                                <p id="chat-text">
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                                    Tincidunt nunc ipsum tempor purus vitae id. Morbi in
-                                    vestibulum nec varius. Et diam cursus quis sed purus
-                                    nam. Scelerisque amet elit non sit ut tincidunt
-                                    condimentum. Nisl ultrices eu venenatis diam.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </li>
-        </div>
         <div id="member-list-component">
             <li class="py-4 flex">
                 <img id="member-avatar" class="h-10 w-10 rounded-full"
@@ -171,38 +125,12 @@
 
     <script>
         username = window.location.hash.replace("#", "");
-        console.log(username);
         if (!username) {
             username = prompt("Enter username");
             if (!username) {
                 //Do not allow without an username
                 window.location.reload();
             }
-        }
-
-        /* Functions Start */
-        function addMessage(from, message, action = "Wrote") {
-            var chatMessageComponent = document.getElementById("chat-message-component");
-
-            chatMessageComponent.querySelector("#chat-sender").innerText = from;
-            chatMessageComponent.querySelector("#chat-sender-avatar").src = "https://ui-avatars.com/api/?name=" + (from.charAt(0));
-            chatMessageComponent.querySelector("#chat-action").innerText = action;
-            chatMessageComponent.querySelector("#chat-text").innerText = message;
-            document.getElementById("chat-room").innerHTML += chatMessageComponent.innerHTML;
-            document.getElementById("chat-room-container").scrollTop = document.getElementById("chat-room").scrollHeight;
-        }
-
-        function sendMessage() {
-            var message = document.getElementById("chat-message-input").value;
-
-            //Publish message, this can be done from backend as well
-            channel.publish("new-message", {
-                message: message
-            }, {
-                from: username
-            });
-
-            document.getElementById("chat-message-input").value = "";
         }
 
         function refreshMembersList() {
@@ -218,23 +146,21 @@
             document.getElementById("members-list").innerHTML = membersListMarkup;
         }
 
-        /* Functions End */
-
-        //Initialize PieSocket
-        console.log(PieSocket);
+        //Initialize PieSocket on v4 — PieRTC rides the same shared connection
+        //as any other subscribe() call, so notifySelf must be set up front.
         var piesocket = new PieSocket.default({
+            version: 4,
             clusterId: 'demo',
             apiKey: 'wDouy4TMvN5Qw4SkhmZ35skbCBKnlv0fDqKQfhmp',
             consoleLogs: true,
             notifySelf: true,
             presence: true,
-            userId: username,
-            version: 4
+            userId: username
         });
 
         piesocket.subscribe("video-chat-channel", {
             video: true,
-            onLocalVideo: (stream, video) => {
+            onLocalVideo: (stream, pieRTC) => {
                 var localVideo = document.getElementById("self-video");
                 localVideo.muted = true;
                 localVideo.autoplay = true;
@@ -252,18 +178,15 @@
                 videoHolder.srcObject = stream;
 
                 var videoCaption = document.createElement("span");
-                videoCaption.innerText = member.user;
+                videoCaption.innerText = member ? member.user : uuid;
 
                 videoContainer.append(videoHolder);
                 videoContainer.append(videoCaption);
 
                 document.getElementById("video-room").append(videoContainer);
-
-
             },
             onParticipantLeft: (uuid) => {
                 var streams = document.getElementsByClassName(uuid);
-                console.log(`Removing ${streams.length} streams from user who left`);
 
                 while (streams.length > 0) {
                     streams[0].remove();
@@ -275,11 +198,7 @@
         }).then(ch => {
             window.channel = ch;
 
-            channel.listen("new-message", function (data, meta) {
-                addMessage(meta.from, data.message);
-            });
-
-            // v4 presence events are double-colon (system::x), not v3's system:x.
+            // v4 events are double-colon end-to-end, including presence.
             channel.listen("system::member_joined", function (data, meta) {
                 refreshMembersList();
             });
@@ -290,7 +209,6 @@
         })
 
         function shareScreen() {
-            // v4 rooms get a PieRTC instance, not v3's Portal.
             channel.pieRTC.shareScreen();
         }
     </script>
