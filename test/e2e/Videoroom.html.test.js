@@ -8,7 +8,7 @@ describe("Chatroom.html", () => {
 
     beforeAll(async () => {
         browser = await puppeteer.launch({
-            args: [ '--use-fake-ui-for-media-stream', '--use-fake-device-for-media-stream' ],
+            args: [ '--use-fake-ui-for-media-stream', '--use-fake-device-for-media-stream', '--no-sandbox', '--disable-setuid-sandbox' ],
             defaultViewport: null,
             headless: true
         });
