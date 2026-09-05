@@ -105,9 +105,9 @@ const room = await piesocket.subscribe('video-room', {
 
 Notes:
 
-- Pass `video: true`, `audio: true`, or `piertc: true` in `subscribe()`'s
+- Pass `video: true`, `audio: true`, or `pieRTC: true` in `subscribe()`'s
   second argument to mark a room as a PieRTC room — the channel is attached a
-  `.pieRTC` instance once subscribed. Note this is `piertc`, not v3 Portal's
+  `.pieRTC` instance once subscribed. Note this is `pieRTC`, not v3 Portal's
   `portal` — under `version: 4`, `portal: true` alone will not attach PieRTC.
 - Signalling frames use their own `rtc::` namespace (`rtc::offer`,
   `rtc::answer`, `rtc::candidate`, etc.) — separate from both v3's `system:`
@@ -118,6 +118,18 @@ Notes:
   on it the same way v3 Portals do. If a PieRTC room is subscribed onto a
   socket that's already open without it, a console warning is logged since
   it can't be changed after the fact.
+- **`notifySelf` is connection-wide under v4, not per-channel.** If a PieRTC
+  room's `subscribe()` call is the one that opens the shared socket, every
+  *other* channel multiplexed onto that same socket also gets `notifySelf`
+  forced on — v4 has no per-channel override for it. If you need a plain
+  channel with `notifySelf` off alongside a PieRTC room, `subscribe()` the
+  plain channel first so it opens the primary connection.
+- **Re-subscribing to an already-open channel does not retroactively attach
+  PieRTC.** `subscribe('room', {video: true})` only attaches `.pieRTC` the
+  first time a channel is subscribed — a later `subscribe('room', {video:
+  true})` call for the same channel ID just returns the existing (non-PieRTC)
+  channel handle, with a console warning. `unsubscribe()` first if you need
+  to turn a plain channel into a PieRTC room.
 
 ## Configuration
 Complete list of allowed configuration options
@@ -146,7 +158,7 @@ List of available methods on the `PieSocket` object
 
 | Method                | Description                                     | Returns  |
 | ----------------------------- | ----------------------------------------------------------------------------- | -------------- |
-| subscribe(channelId, roomOptions)    | Subscribe to a channel. Pass `{video: true}`, `{audio: true}`, or `{portal: true}` (v3) / `{piertc: true}` (v4) in `roomOptions` for a WebRTC room. |  Channel Object |
+| subscribe(channelId, roomOptions)    | Subscribe to a channel. Pass `{video: true}`, `{audio: true}`, or `{portal: true}` (v3) / `{pieRTC: true}` (v4) in `roomOptions` for a WebRTC room. |  Channel Object |
 | unsubscribe(channelId)  | Un-subscribe from a channel.                  |  Boolean |
 | getConnections()        | Get list of all active connections/channels for this client. | Object |
 

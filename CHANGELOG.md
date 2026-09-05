@@ -9,8 +9,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 - **`portal: true` no longer attaches PieRTC under `version: 4`** (it did in
-  v7.0.0). Use `piertc: true` instead (`video: true`/`audio: true` still work
+  v7.0.0). Use `pieRTC: true` instead (`video: true`/`audio: true` still work
   as before). v3's `Portal` and its `portal: true` flag are unaffected.
+
+### Fixed
+- A plain (non-PieRTC) subscriber sharing a channel name with a PieRTC room
+  no longer crashes on the room's `rtc::*` signalling frames — `Channel`'s
+  `rtc::*` handlers are now guarded on `this.pieRTC` being attached, the same
+  way v3's `system:portal_*` handlers are guarded on `this.portal`.
+- Re-subscribing to an already-open v4 channel with `{video: true}` (etc.)
+  used to silently return the existing channel without a `.pieRTC` attached;
+  it now logs a warning instead of failing silently. This does not
+  retroactively attach PieRTC — `unsubscribe()` first if you need to change
+  room options.
+
+### Known limitation
+- `notifySelf` is connection-wide under v4, not per-channel: if a PieRTC
+  room's `subscribe()` call is the one that opens the shared socket, every
+  other channel multiplexed onto it also gets `notifySelf` forced on. See
+  the README's PieRTC notes.
 
 ## v7.0.0 - 2026-09-05
 

@@ -22,9 +22,9 @@ export default class PieSocket {
     // v4 multi-channel: one shared WebSocket for every subscribe() call.
     // PieRTC (v4's WebRTC room) rides the same shared connection; v3's Portal
     // still gets its own dedicated standalone connection. The two are flagged
-    // differently on purpose: v4 rooms use `piertc: true`, not v3's `portal: true`.
+    // differently on purpose: v4 rooms use `pieRTC: true`, not v3's `portal: true`.
     if (this.options.version == 4) {
-      const isPieRTC = !!(roomOptions.video || roomOptions.audio || roomOptions.piertc);
+      const isPieRTC = !!(roomOptions.video || roomOptions.audio || roomOptions.pieRTC);
       return this.subscribeMultiplexed(channelId, roomOptions, isPieRTC);
     }
 
@@ -81,7 +81,19 @@ export default class PieSocket {
   async subscribeMultiplexed(channelId, roomOptions={}, isPieRTC=false) {
     if (this.connections[channelId]) {
       this.logger.log('Returning existing channel', channelId);
-      return this.connections[channelId];
+      const existing = this.connections[channelId];
+      if (isPieRTC && !existing.pieRTC) {
+        // Re-subscribing to an already-open channel never re-runs the attach
+        // logic below (or subscribeStandalone's own onSocketConnected), so a
+        // later subscribe() with {video: true} on the same channelId can't
+        // retroactively attach PieRTC — surface that instead of staying silent.
+        this.logger.warn(
+            'PieSocket: subscribe() for "' + channelId + '" asked for a PieRTC room, ' +
+            'but this channel is already subscribed without one — unsubscribe first ' +
+            'if you need to change room options.',
+        );
+      }
+      return existing;
     }
 
     const uuid = uuidv4();

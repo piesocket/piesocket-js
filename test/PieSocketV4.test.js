@@ -201,9 +201,9 @@ describe('PieSocket v4 — shared connection', () => {
     expect(channel.pieRTC).toBeTruthy();
   });
 
-  it('piertc: true (no video/audio) attaches PieRTC — v4\'s own flag, not v3\'s portal', async () => {
+  it('pieRTC: true (no video/audio) attaches PieRTC — v4\'s own flag, not v3\'s portal', async () => {
     const piesocket = newClient();
-    const pending = piesocket.subscribe('watch-only-room', {piertc: true});
+    const pending = piesocket.subscribe('watch-only-room', {pieRTC: true});
     await flush();
     lastSocket().onopen({});
 
@@ -219,6 +219,19 @@ describe('PieSocket v4 — shared connection', () => {
 
     const channel = await pending;
     expect(channel.pieRTC).toBeFalsy();
+  });
+
+  it('re-subscribing an already-open channel with {video: true} does not retroactively attach PieRTC', async () => {
+    const piesocket = newClient();
+    const p1 = piesocket.subscribe('room-1');
+    await flush();
+    lastSocket().onopen({});
+    const first = await p1;
+    expect(first.pieRTC).toBeFalsy();
+
+    const second = await piesocket.subscribe('room-1', {video: true});
+    expect(second).toBe(first);
+    expect(second.pieRTC).toBeFalsy();
   });
 });
 

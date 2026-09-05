@@ -294,19 +294,19 @@ export default class Channel {
       this.portal.createAnswer(message.data);
     } else if (message.event == 'system:video_answer' && message.data.to == this.uuid) {
       this.portal.handleAnswer(message.data);
-    } else if (message.event == 'rtc::broadcaster' && message.data.from != this.uuid) {
+    } else if (this.pieRTC && message.event == 'rtc::broadcaster' && message.data.from != this.uuid) {
       this.pieRTC.requestOfferFromPeer(message.data);
-    } else if (message.event == 'rtc::stopped_screen' && message.data.from != this.uuid) {
+    } else if (this.pieRTC && message.event == 'rtc::stopped_screen' && message.data.from != this.uuid) {
       this.pieRTC.onRemoteScreenStopped(message.data.from, message.data.streamId);
-    } else if (message.event == 'rtc::watcher' && message.data.from != this.uuid) {
+    } else if (this.pieRTC && message.event == 'rtc::watcher' && message.data.from != this.uuid) {
       this.pieRTC.shareVideo(message.data);
-    } else if (message.event == 'rtc::request' && message.data.from != this.uuid) {
+    } else if (this.pieRTC && message.event == 'rtc::request' && message.data.from != this.uuid) {
       this.pieRTC.shareVideo(message.data);
-    } else if (message.event == 'rtc::candidate' && message.data.to == this.uuid) {
+    } else if (this.pieRTC && message.event == 'rtc::candidate' && message.data.to == this.uuid) {
       this.pieRTC.addIceCandidate(message.data);
-    } else if (message.event == 'rtc::offer' && message.data.to == this.uuid) {
+    } else if (this.pieRTC && message.event == 'rtc::offer' && message.data.to == this.uuid) {
       this.pieRTC.createAnswer(message.data);
-    } else if (message.event == 'rtc::answer' && message.data.to == this.uuid) {
+    } else if (this.pieRTC && message.event == 'rtc::answer' && message.data.to == this.uuid) {
       this.pieRTC.handleAnswer(message.data);
     }
   }

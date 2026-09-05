@@ -133,4 +133,17 @@ describe('Channel — v4 PieRTC dispatch', () => {
     channel.handleFrame(frame('system::member_left', {member: {uuid: 'peer-1'}, count: 0}));
     expect(channel.pieRTC.removeParticipant).toHaveBeenCalledWith('peer-1');
   });
+
+  it('does not throw on an rtc:: event for a channel with no PieRTC attached', () => {
+    // A plain (non-PieRTC) subscriber sharing a channel name with a PieRTC
+    // room still receives its rtc:: broadcasts — must not crash on dispatch.
+    const channel = makeV4Channel();
+    expect(channel.pieRTC).toBeFalsy();
+    expect(() => {
+      channel.handleFrame(frame('rtc::broadcaster', {from: 'peer-1'}));
+      channel.handleFrame(frame('rtc::offer', {from: 'peer-1', to: 'me', sdp: {}}));
+      channel.handleFrame(frame('rtc::candidate', {from: 'peer-1', to: 'me', ice: {}}));
+      channel.handleFrame(frame('rtc::answer', {from: 'peer-1', to: 'me', sdp: {}}));
+    }).not.toThrow();
+  });
 });
