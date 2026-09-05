@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Multi-channel (v4) - PieSocket Channels</title>
+	<script src="https://cdn.tailwindcss.com" defer></script>
+	<script src="/dist/piesocket.js"></script>
+</head>
+
+<body class="bg-gray-50">
+	<div class="max-w-3xl mx-auto p-8 space-y-6">
+		<h1 class="text-xl font-semibold text-gray-900">PieSocket v4 &mdash; one socket, many channels</h1>
+		<p class="text-sm text-gray-500">
+			Every <code>subscribe()</code> below shares a single WebSocket. Open this
+			page in two tabs and watch messages and presence flow per channel.
+		</p>
+
+		<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+			<div class="bg-white rounded-lg border border-gray-200 p-4 space-y-3">
+				<h2 class="font-medium text-gray-900">#room-a</h2>
+				<div id="log-room-a" class="h-40 overflow-auto text-sm text-gray-700 space-y-1"></div>
+				<form data-channel="room-a" class="flex gap-2">
+					<input class="flex-1 border rounded px-2 py-1 text-sm" placeholder="Message room-a" />
+					<button class="bg-indigo-600 text-white text-sm rounded px-3">Send</button>
+				</form>
+			</div>
+
+			<div class="bg-white rounded-lg border border-gray-200 p-4 space-y-3">
+				<h2 class="font-medium text-gray-900">#presence-room-b</h2>
+				<div id="log-presence-room-b" class="h-40 overflow-auto text-sm text-gray-700 space-y-1"></div>
+				<form data-channel="presence-room-b" class="flex gap-2">
+					<input class="flex-1 border rounded px-2 py-1 text-sm" placeholder="Message room-b" />
+					<button class="bg-indigo-600 text-white text-sm rounded px-3">Send</button>
+				</form>
+				<button id="refresh-b" class="text-xs text-indigo-600 underline">refreshMembers()</button>
+				<div id="members-presence-room-b" class="text-xs text-gray-500"></div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		const username = window.location.hash.replace('#', '') || ('guest-' + Math.floor(Math.random() * 1000));
+
+		function log(channelId, line) {
+			const el = document.getElementById('log-' + channelId);
+			el.innerHTML += '<div>' + line + '</div>';
+			el.scrollTop = el.scrollHeight;
+		}
+
+		function renderMembers(channel) {
+			document.getElementById('members-presence-room-b').innerText =
+				'members: ' + channel.members.map((m) => (m && m.user) || m).join(', ');
+		}
+
+		const piesocket = new PieSocket.default({
+			version: 4,
+			clusterDomain: 'localhost:4001',
+			ssl: false,
+			apiKey: 'testkey',
+			consoleLogs: true,
+			notifySelf: true,
+			userId: username,
+		});
+
+		const channels = {};
+
+		async function wire(channelId) {
+			const channel = await piesocket.subscribe(channelId);
+			channels[channelId] = channel;
+
+			channel.listen('chat', (data, meta) => log(channelId, '<b>' + meta.from + ':</b> ' + data.text));
+			channel.listen('system::member_joined', (data) => {
+				log(channelId, '<i>' + (data.member.user || data.member) + ' joined</i>');
+				renderMembers(channel);
+			});
+			channel.listen('system::member_left', (data) => {
+				log(channelId, '<i>' + (data.member.user || data.member) + ' left</i>');
+				renderMembers(channel);
+			});
+			channel.listen('system::member_list', () => renderMembers(channel));
+		}
+
+		wire('room-a');
+		wire('presence-room-b');
+
+		document.querySelectorAll('form[data-channel]').forEach((form) => {
+			form.onsubmit = (e) => {
+				e.preventDefault();
+				const input = form.querySelector('input');
+				channels[form.dataset.channel].publish('chat', {text: input.value}, {from: username});
+				input.value = '';
+			};
+		});
+
+		document.getElementById('refresh-b').onclick = () =>
+			channels['presence-room-b'].refreshMembers().then(() => renderMembers(channels['presence-room-b']));
+	</script>
+</body>
+
+</html>

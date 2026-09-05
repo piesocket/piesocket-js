@@ -27,6 +27,46 @@ export default class Channel {
     this.logger = new Logger(identity);
   }
 
+  /**
+   * Wire this handle to a shared {@link Connection} (PieSocket v4). The socket
+   * lifecycle lives on the Connection; this handle only routes frames.
+   * @param {*} connection Shared Connection instance (null in non-browser envs)
+   * @param {string} channelId
+   * @param {*} identity
+   */
+  attachToConnection(connection, channelId, identity) {
+    this.hub = connection;
+    this.channelId = channelId;
+    this.identity = identity;
+    this.shouldReconnect = false;
+    this.logger = new Logger(identity);
+  }
+
+  memberKey(member) {
+    if (member && typeof member === 'object') {
+      return member.uuid != null ? 'uuid:' + member.uuid : 'obj:' + JSON.stringify(member);
+    }
+    return 'val:' + String(member);
+  }
+
+  addMember(member) {
+    if (member == null) {
+      return;
+    }
+    const key = this.memberKey(member);
+    if (!this.members.some((m) => this.memberKey(m) === key)) {
+      this.members.push(member);
+    }
+  }
+
+  removeMember(member) {
+    if (member == null) {
+      return;
+    }
+    const key = this.memberKey(member);
+    this.members = this.members.filter((m) => this.memberKey(m) !== key);
+  }
+
   getMemberByUUID(uuid) {
     let member = null;
     for (let i = 0; i < this.members.length; i++) {
@@ -72,6 +112,9 @@ export default class Channel {
 
 
   send(data) {
+    if (this.hub) {
+      return this.hub.send(this.channelId, data);
+    }
     return this.connection.send(data);
   }
 
@@ -79,11 +122,29 @@ export default class Channel {
     if (meta && meta.blockchain) {
       return await this.sendOnBlockchain(event, data, meta);
     }
-    return this.connection.send(JSON.stringify({
+
+    const payload = {
       event: event,
       data: data,
       meta: meta,
-    }));
+    };
+
+    if (this.hub) {
+      return this.hub.send(this.channelId, payload);
+    }
+    return this.connection.send(JSON.stringify(payload));
+  }
+
+  /**
+   * Re-sync this channel's presence roster from the server via
+   * `system:get_members`. Resolves with the refreshed member list.
+   * @return {Promise<Array>}
+   */
+  refreshMembers() {
+    if (this.hub) {
+      return this.hub.requestMembers(this.channelId);
+    }
+    return Promise.resolve(this.members);
   }
 
 
@@ -104,7 +165,7 @@ export default class Channel {
         });
       }
 
-      return this.connection.send(JSON.stringify({'event': event, 'data': data, 'meta': {...meta, 'transaction_id': receipt.id, 'transaction_hash': receipt.hash}}));
+      return this.send(JSON.stringify({'event': event, 'data': data, 'meta': {...meta, 'transaction_id': receipt.id, 'transaction_hash': receipt.hash}}));
     } catch (e) {
       if (this.events['blockchain-error']) {
         this.events['blockchain-error'].bind(this)(e);
@@ -128,7 +189,7 @@ export default class Channel {
         });
       }
 
-      return this.connection.send(JSON.stringify({'event': event, 'data': transactionHash, 'meta': {'transaction_id': 1, 'transaction_hash': hash}}));
+      return this.send(JSON.stringify({'event': event, 'data': transactionHash, 'meta': {'transaction_id': 1, 'transaction_hash': hash}}));
     } catch (e) {
       if (this.events['blockchain-error']) {
         this.events['blockchain-error'].bind(this)(e);
@@ -139,42 +200,78 @@ export default class Channel {
   onMessage(e) {
     this.logger.log('Channel message:', e);
 
+    let message = null;
     try {
-      const message = JSON.parse(e.data);
-      if (message.error && message.error.length) {
-        this.shouldReconnect = false;
-      }
-
-      // Fire event listeners
-      if (message.event) {
-        this.handleMemberHandshake(message);
-
-        if (this.listeners[message.event]) {
-          this.listeners[message.event].bind(this)(message.data, message.meta);
-        }
-
-        if (this.listeners['*']) {
-          this.listeners['*'].bind(this)(message.event, message.data, message.meta);
-        }
-      }
+      message = JSON.parse(e.data);
     } catch (jsonException) {
       console.error(jsonException);
     }
 
+    this.dispatch(message, e);
+  }
+
+  /**
+   * Route a parsed frame to listeners + presence handling, then fire the
+   * `message` lifecycle callback. Shared by the v3 socket path and the v4
+   * multiplexed {@link Connection}.
+   * @param {*} message Parsed frame, or null for a non-JSON payload
+   * @param {*} rawEvent Original socket MessageEvent
+   */
+  dispatch(message, rawEvent) {
+    if (message) {
+      this.handleFrame(message);
+    }
+
     // Fire lifecycle callback
     if (this.events['message']) {
-      this.events['message'].bind(this)(e);
+      this.events['message'].bind(this)(rawEvent);
+    }
+  }
+
+  handleFrame(message) {
+    if (message.error && message.error.length) {
+      this.shouldReconnect = false;
+    }
+
+    if (message.event) {
+      this.handleMemberHandshake(message);
+
+      if (this.listeners[message.event]) {
+        this.listeners[message.event].bind(this)(message.data, message.meta);
+      }
+
+      if (this.listeners['*']) {
+        this.listeners['*'].bind(this)(message.event, message.data, message.meta);
+      }
     }
   }
 
   handleMemberHandshake(message) {
-    if (message.event == 'system:member_list') {
-      this.members = message.data.members;
-    } else if (message.event == 'system:member_joined') {
-      this.members = message.data.members;
-    } else if (message.event == 'system:member_left') {
-      this.members = message.data.members;
-      if (this.portal) {
+    // v4 delivers presence as deltas: member_joined / member_left carry only the
+    // member that changed, and the full roster arrives once as member_list (on
+    // join or in response to system::get_members / refreshMembers()). v4's
+    // system events are double-colon (`system::x`) end-to-end; v3's stay
+    // single-colon. Portal/WebRTC events below are always v3, so untouched.
+    const deltaPresence = this.identity && this.identity.version == 4;
+    const memberListEvent = deltaPresence ? 'system::member_list' : 'system:member_list';
+    const memberJoinedEvent = deltaPresence ? 'system::member_joined' : 'system:member_joined';
+    const memberLeftEvent = deltaPresence ? 'system::member_left' : 'system:member_left';
+
+    if (message.event == memberListEvent) {
+      this.members = Array.isArray(message.data.members) ? message.data.members : [];
+    } else if (message.event == memberJoinedEvent) {
+      if (deltaPresence) {
+        this.addMember(message.data.member);
+      } else {
+        this.members = message.data.members;
+      }
+    } else if (message.event == memberLeftEvent) {
+      if (deltaPresence) {
+        this.removeMember(message.data.member);
+      } else {
+        this.members = message.data.members;
+      }
+      if (this.portal && message.data.member) {
         this.portal.removeParticipant(message.data.member.uuid);
       }
     } else if (message.event == 'system:portal_broadcaster' && message.data.from != this.uuid) {
