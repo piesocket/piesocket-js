@@ -20,7 +20,7 @@ npm i piesocket-js
 
 CDN
 ```html
-<script src="https://unpkg.com/piesocket-js@5"></script>
+<script src="https://unpkg.com/piesocket-js@7"></script>
 ```
 
 ## Importing
@@ -105,9 +105,10 @@ const room = await piesocket.subscribe('video-room', {
 
 Notes:
 
-- Pass `video: true`, `audio: true`, or `portal: true` in `subscribe()`'s
+- Pass `video: true`, `audio: true`, or `piertc: true` in `subscribe()`'s
   second argument to mark a room as a PieRTC room — the channel is attached a
-  `.pieRTC` instance once subscribed.
+  `.pieRTC` instance once subscribed. Note this is `piertc`, not v3 Portal's
+  `portal` — under `version: 4`, `portal: true` alone will not attach PieRTC.
 - Signalling frames use their own `rtc::` namespace (`rtc::offer`,
   `rtc::answer`, `rtc::candidate`, etc.) — separate from both v3's `system:`
   and v4's `system::` conventions, so they're never mistaken for control
@@ -145,7 +146,7 @@ List of available methods on the `PieSocket` object
 
 | Method                | Description                                     | Returns  |
 | ----------------------------- | ----------------------------------------------------------------------------- | -------------- |
-| subscribe(channelId)    | Subscribe to a channel.                       |  Channel Object |
+| subscribe(channelId, roomOptions)    | Subscribe to a channel. Pass `{video: true}`, `{audio: true}`, or `{portal: true}` (v3) / `{piertc: true}` (v4) in `roomOptions` for a WebRTC room. |  Channel Object |
 | unsubscribe(channelId)  | Un-subscribe from a channel.                  |  Boolean |
 | getConnections()        | Get list of all active connections/channels for this client. | Object |
 
@@ -159,6 +160,7 @@ List of available methods on the `Channel` object
 | publish("event-name", data, meta)  | Publish message from client.         
 | getMemberByUUID(uuid)  | Get a Presence member from their uuid.         
 | refreshMembers()  | (v4) Re-sync the presence roster from the server. Returns a Promise of the member list.         
+| .portal / .pieRTC  | Set on a WebRTC room channel — `.portal` under v3, `.pieRTC` under v4. See [Portals](#portals) / [PieRTC](#piertc-v4).         
 | on("lifecycle-event", callback)        | Listen to lifecycle events on the native [WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API) connection.
 | confirmOnBlockchain(event, transaction_hash)        | Create a proof-of-witness for a Blockchain message, on receiver's end.
 

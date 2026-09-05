@@ -200,6 +200,26 @@ describe('PieSocket v4 — shared connection', () => {
     expect(channel.channelId).toBe('video-room-2');
     expect(channel.pieRTC).toBeTruthy();
   });
+
+  it('piertc: true (no video/audio) attaches PieRTC — v4\'s own flag, not v3\'s portal', async () => {
+    const piesocket = newClient();
+    const pending = piesocket.subscribe('watch-only-room', {piertc: true});
+    await flush();
+    lastSocket().onopen({});
+
+    const channel = await pending;
+    expect(channel.pieRTC).toBeTruthy();
+  });
+
+  it('portal: true alone does NOT attach PieRTC under v4 (v3-only flag)', async () => {
+    const piesocket = newClient();
+    const pending = piesocket.subscribe('not-a-room', {portal: true});
+    await flush();
+    lastSocket().onopen({});
+
+    const channel = await pending;
+    expect(channel.pieRTC).toBeFalsy();
+  });
 });
 
 describe('PieSocket v4 — SSR / no WebSocket global', () => {

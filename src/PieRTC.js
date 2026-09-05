@@ -4,7 +4,7 @@ import PeerConnection from './misc/RTCPeerConnection.js';
 import SessionDescription from './misc/RTCSessionDescription.js';
 const defaultRTCOptions = {
   shouldBroadcast: true,
-  portal: true,
+  piertc: true,
   video: false,
   audio: true,
 };

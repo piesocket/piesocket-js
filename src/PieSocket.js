@@ -7,7 +7,7 @@ import InvalidAuthException from './InvalidAuthException.js';
 import defaultOptions from './misc/DefaultOptions.js';
 import {v4 as uuidv4} from 'uuid';
 
-const SDK_VERSION = '7.0.0';
+const SDK_VERSION = '7.1.0';
 
 export default class PieSocket {
   constructor(options) {
@@ -19,15 +19,16 @@ export default class PieSocket {
   }
 
   async subscribe(channelId, roomOptions={}) {
-    const isPortal = !!(roomOptions.video || roomOptions.audio || roomOptions.portal);
-
     // v4 multi-channel: one shared WebSocket for every subscribe() call.
     // PieRTC (v4's WebRTC room) rides the same shared connection; v3's Portal
-    // still gets its own dedicated standalone connection.
+    // still gets its own dedicated standalone connection. The two are flagged
+    // differently on purpose: v4 rooms use `piertc: true`, not v3's `portal: true`.
     if (this.options.version == 4) {
-      return this.subscribeMultiplexed(channelId, roomOptions, isPortal);
+      const isPieRTC = !!(roomOptions.video || roomOptions.audio || roomOptions.piertc);
+      return this.subscribeMultiplexed(channelId, roomOptions, isPieRTC);
     }
 
+    const isPortal = !!(roomOptions.video || roomOptions.audio || roomOptions.portal);
     return this.subscribeStandalone(channelId, roomOptions, isPortal);
   }
 
@@ -77,7 +78,7 @@ export default class PieSocket {
     });
   }
 
-  async subscribeMultiplexed(channelId, roomOptions={}, isPortal=false) {
+  async subscribeMultiplexed(channelId, roomOptions={}, isPieRTC=false) {
     if (this.connections[channelId]) {
       this.logger.log('Returning existing channel', channelId);
       return this.connections[channelId];
@@ -98,7 +99,7 @@ export default class PieSocket {
     // waits on the in-flight open instead, then retries as a secondary
     // subscribe once `_multiplex` is set.
     if (!this._multiplex) {
-      if (isPortal) {
+      if (isPieRTC) {
         // Mirrors subscribeStandalone: PieRTC wants its own signalling
         // echoed back. Only takes effect if this call is the one opening
         // the primary connection — see the warning below otherwise.
@@ -107,7 +108,7 @@ export default class PieSocket {
 
       if (this._multiplexOpening) {
         await this._multiplexOpening.catch(() => {});
-        return this.subscribeMultiplexed(channelId, roomOptions, isPortal);
+        return this.subscribeMultiplexed(channelId, roomOptions, isPieRTC);
       }
 
       this._multiplexOpening = this._openPrimaryConnection(channelId, uuid, presence, noWebSocket)
@@ -115,11 +116,11 @@ export default class PieSocket {
             this._multiplexOpening = null;
           });
 
-      // Non-portal path returns the in-flight promise directly (no extra
+      // Non-PieRTC path returns the in-flight promise directly (no extra
       // await tick) — a concurrent secondary subscribe() races against this
       // same resolution to send its own control frame, and adding a tick
       // here throws that race off (see PieSocketV4.test.js).
-      if (!isPortal) {
+      if (!isPieRTC) {
         return this._multiplexOpening;
       }
 
@@ -130,7 +131,7 @@ export default class PieSocket {
       return channel;
     }
 
-    if (isPortal && !this.options.notifySelf) {
+    if (isPieRTC && !this.options.notifySelf) {
       this.logger.warn(
           'PieSocket: PieRTC channel "' + channelId + '" is joining a socket ' +
           'that was already opened without notifySelf — pass notifySelf: true ' +
@@ -153,7 +154,7 @@ export default class PieSocket {
     this._multiplex.attachChannel(channelId, channel);
     this.connections[channelId] = channel;
 
-    if (isPortal && !noWebSocket) {
+    if (isPieRTC && !noWebSocket) {
       this.attachPieRTC(channel, roomOptions);
     }
 

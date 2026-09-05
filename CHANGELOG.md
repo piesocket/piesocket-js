@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## v7.1.0 - 2026-09-05
+
+### Changed
+- **`portal: true` no longer attaches PieRTC under `version: 4`** (it did in
+  v7.0.0). Use `piertc: true` instead (`video: true`/`audio: true` still work
+  as before). v3's `Portal` and its `portal: true` flag are unaffected.
+
 ## v7.0.0 - 2026-09-05
 
 ### Added
