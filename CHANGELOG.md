@@ -22,6 +22,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   it now logs a warning instead of failing silently. This does not
   retroactively attach PieRTC — `unsubscribe()` first if you need to change
   room options.
+- e2e Puppeteer tests (`test/e2e/*`) failed to launch Chromium on Linux CI
+  (`No usable sandbox!`) — added `--no-sandbox`/`--disable-setuid-sandbox`
+  launch args. `examples/chatroom.html` also pointed its e2e test at a local
+  `localhost:4001` backend that isn't part of CI; switched it to the same
+  reachable `demo` cluster `videoroom.html` uses.
+- CI matrix dropped Node 14.x/16.x (both EOL, and incompatible with
+  `.npmrc`'s `NODE_OPTIONS=--openssl-legacy-provider`, which only exists on
+  Node 17+ — `npm ci` failed outright on those two before any tests ran) in
+  favor of 18.x/20.x/22.x.
 
 ### Known limitation
 - `notifySelf` is connection-wide under v4, not per-channel: if a PieRTC
