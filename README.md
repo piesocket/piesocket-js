@@ -48,6 +48,36 @@ Channels are realtime PubSub connections over WebSocket, they allow you to:
 
 See the [Channels documentation](https://www.piesocket.com/docs/3.0/channels) to learn more about how to use Channels.
 
+#### v4 — multi-channel over one connection
+
+Pass `version: 4` to share a **single** WebSocket across every `subscribe()`
+call. Each `subscribe()` still returns a `Channel` with the same
+`listen` / `publish` / member API — the multiplexing is transparent:
+
+```javascript
+const piesocket = new PieSocket({ version: 4, clusterId: 'xxxxx', apiKey: 'yyyyy' });
+
+const chat   = await piesocket.subscribe('chat-room');   // opens the socket
+const alerts = await piesocket.subscribe('alerts');      // rides the same socket
+
+chat.listen('message', (data) => { /* ... */ });
+alerts.publish('ping', { at: Date.now() });
+```
+
+Notes for v4:
+
+- **Presence is delta-based.** The full roster arrives once; after that
+  `Channel.members` is kept in sync from join/leave deltas. Call
+  `channel.refreshMembers()` to re-sync from the server on demand.
+- **Binary needs no opt-in.** Any binary frame is delivered as a
+  `system::binary` event (an `ArrayBuffer`). Note the double colon — all v4
+  system events (`system::member_joined`, `system::binary`, etc.) use it,
+  unlike v3's single-colon `system:` events.
+- **Unsubscribing the connect-time channel** promotes another subscribed
+  channel to keep the connection alive; a few in-flight frames may be missed
+  during the swap.
+- **Portals/video** always use the v3 protocol, even when `version: 4` is set.
+
 ### Portals
 Portals are programmable video streams over WebRTC, they allow you to build powerful video applications.
 
@@ -59,6 +89,7 @@ Complete list of allowed configuration options
 | Option                | Description                                     | Default  |
 | ----------------------------- | ----------------------------------------------------------------------------- | -------------- |
 | apiKey             | Required, Your PieSocket API key.                |  Demo key |
+| version            | Protocol version. Set to `4` for multi-channel multiplexing over one connection. |  `3` |
 | clusterId          | Your API key's cluster ID.                       |  `demo` |
 | clusterDomain          | For self hosted endpoints (localhost:4001) or custom domains in managed Piesocket                     |  `null` |
 | ssl          |  Set to `false` to use ws:// protocol, useful for self-hosted servers                    |  `true` |
@@ -92,6 +123,7 @@ List of available methods on the `Channel` object
 | listen("event-name", callback)    | Listen to an event.           
 | publish("event-name", data, meta)  | Publish message from client.         
 | getMemberByUUID(uuid)  | Get a Presence member from their uuid.         
+| refreshMembers()  | (v4) Re-sync the presence roster from the server. Returns a Promise of the member list.         
 | on("lifecycle-event", callback)        | Listen to lifecycle events on the native [WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API) connection.
 | confirmOnBlockchain(event, transaction_hash)        | Create a proof-of-witness for a Blockchain message, on receiver's end.
 
