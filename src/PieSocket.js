@@ -7,7 +7,7 @@ import InvalidAuthException from './InvalidAuthException.js';
 import defaultOptions from './misc/DefaultOptions.js';
 import {v4 as uuidv4} from 'uuid';
 
-const SDK_VERSION = '6.1.0';
+const SDK_VERSION = '7.0.0';
 
 export default class PieSocket {
   constructor(options) {
