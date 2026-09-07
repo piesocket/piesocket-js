@@ -2,6 +2,13 @@ import '@babel/polyfill';
 import Connection from '../src/Connection';
 import Channel from '../src/Channel';
 
+// jest 27's node test environment doesn't curate the global Blob that Node
+// itself has had since v18 — pull it in explicitly so the Blob-send test
+// exercises the real class instead of skipping.
+if (typeof Blob === 'undefined') {
+  global.Blob = require('buffer').Blob;
+}
+
 // Controllable WebSocket mock — captures every instance so tests can drive its
 // lifecycle handlers by hand. `mock`-prefixed names are the only out-of-scope
 // refs jest.mock() allows.
@@ -113,15 +120,49 @@ describe('Connection', () => {
     expect(mockSend).toHaveBeenCalledWith(buffer);
   });
 
-  it('sends a Uint8Array (TypedArray view) raw too', () => {
+  it('sends a Uint8Array (TypedArray view) raw too, on the primary channel', () => {
     const conn = new Connection('wss://x/v4/room-1', {}, 'room-1');
     lastSocket().onopen({});
     mockSend.mockClear();
 
     const bytes = new Uint8Array([1, 2, 3]);
-    conn.send('room-2', bytes);
+    conn.send('room-1', bytes);
 
     expect(mockSend).toHaveBeenCalledWith(bytes);
+  });
+
+  it('JSON-smuggles binary sent on a secondary channel instead of sending it raw', () => {
+    // Raw bytes carry no room for a channel tag, and the server always
+    // attributes a raw binary frame to the primary channel — so a secondary
+    // channel's binary send has to go as a JSON text frame instead, tagged
+    // with system::channel like any other secondary-channel message.
+    const conn = new Connection('wss://x/v4/room-1', {}, 'room-1');
+    lastSocket().onopen({});
+    mockSend.mockClear();
+
+    const buffer = new Uint8Array([1, 2, 3]).buffer;
+    conn.send('room-2', buffer);
+
+    expect(lastFrame()).toEqual({
+      event: 'pie::binary',
+      'system::channel': 'room-2',
+      data: Buffer.from([1, 2, 3]).toString('base64'),
+    });
+  });
+
+  it('JSON-smuggles a Blob sent on a secondary channel (async)', async () => {
+    const conn = new Connection('wss://x/v4/room-1', {}, 'room-1');
+    lastSocket().onopen({});
+    mockSend.mockClear();
+
+    const blob = new Blob([new Uint8Array([1, 2, 3])]);
+    await conn.send('room-2', blob);
+
+    expect(lastFrame()).toEqual({
+      event: 'pie::binary',
+      'system::channel': 'room-2',
+      data: Buffer.from([1, 2, 3]).toString('base64'),
+    });
   });
 
   it('routes an inbound frame to the channel named by system::channel', () => {
@@ -166,6 +207,27 @@ describe('Connection', () => {
     conn.onMessage({data: JSON.stringify({event: 'system::binary', data: b64})});
 
     expect(Buffer.from(received).toString()).toBe('hello');
+  });
+
+  it('decodes a JSON-smuggled secondary-channel binary frame and routes it, as system::binary', () => {
+    const conn = new Connection('wss://x/v4/room-1', {}, 'room-1');
+    const primary = attach(conn, 'room-1', {primary: true});
+    const secondary = attach(conn, 'room-2');
+    lastSocket().onopen({});
+
+    let received;
+    secondary.listen('system::binary', (data) => {
+      received = data;
+    });
+    const primarySpy = jest.spyOn(primary, 'dispatch');
+
+    const b64 = Buffer.from('hello').toString('base64');
+    conn.onMessage({
+      data: JSON.stringify({event: 'pie::binary', 'system::channel': 'room-2', data: b64}),
+    });
+
+    expect(Buffer.from(received).toString()).toBe('hello');
+    expect(primarySpy).not.toHaveBeenCalled();
   });
 
   it('requests members and resolves with the refreshed roster', async () => {

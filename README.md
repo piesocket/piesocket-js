@@ -74,7 +74,12 @@ Notes for v4:
 - **Binary needs no opt-in.** Any binary frame is delivered as a
   `system::binary` event (an `ArrayBuffer`). Note the double colon — all v4
   system events (`system::member_joined`, `system::binary`, etc.) use it,
-  unlike v3's single-colon `system:` events.
+  unlike v3's single-colon `system:` events. Binary sent on the primary
+  channel goes straight over the wire as raw bytes; on a secondary channel
+  it's base64-encoded first (there's no way to tag raw bytes with a channel,
+  unlike JSON frames) — transparent to `channel.send()` / `channel.listen()`
+  either way, just with the usual ~33% base64 overhead on a secondary
+  channel's message-size limit.
 - **Unsubscribing the connect-time channel** promotes another subscribed
   channel to keep the connection alive; a few in-flight frames may be missed
   during the swap.

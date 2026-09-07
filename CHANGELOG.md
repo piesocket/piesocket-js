@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## v7.3.0 - 2026-09-07
+
+### Added
+- **Binary sends (`ArrayBuffer`/`TypedArray`/`Blob`) now work on any v4
+  channel, not just the primary.** A raw binary WS frame carries no room for
+  a `system::channel` tag, so v7.2.0's fix still only reached the primary
+  channel of a multiplexed connection — a secondary channel's `send()`
+  silently ended up on the wrong channel at the receiving end. Binary sent
+  on a secondary channel is now base64-encoded and sent as a JSON text frame
+  instead (tagged with `system::channel`, same as any other secondary-channel
+  message), and the receiving SDK transparently decodes it back into an
+  `ArrayBuffer` before dispatching to `channel.listen('system::binary', ...)`
+  — app code sees no difference between a primary-channel binary frame and a
+  secondary-channel one. The primary channel keeps sending raw bytes, since
+  that path has no ambiguity and no base64 overhead.
+
 ## v7.2.0 - 2026-09-07
 
 ### Fixed

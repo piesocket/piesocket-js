@@ -13,6 +13,16 @@ const timeout = (fn, ms) => {
   return t;
 };
 
+// Wire-level event name for binary smuggled inside a JSON text frame (see
+// Connection#send). Deliberately NOT `system:`-prefixed: the server treats
+// any event starting with `system:` as a control frame (subscribe/
+// unsubscribe/etc.) and intercepts it before channel routing even runs, so
+// a real `system::binary` here would be rejected with "Unknown system
+// event" instead of ever reaching the channel. The receiving Connection
+// still hands it to app code as `system::binary`, same as a true binary
+// frame — this name only exists on the wire.
+const PIE_BINARY_EVENT = 'pie::binary';
+
 // `typeof data === 'object'` is true for ArrayBuffer/Blob too, which would
 // otherwise fall into Connection#send's JSON.stringify path — checked first
 // so binary payloads never get mistaken for a plain object to encode.
@@ -119,14 +129,20 @@ export default class Connection {
    * @return {*}
    */
   send(channelId, data) {
-    // ArrayBuffer/TypedArray/Blob can't be JSON-encoded or tagged with
-    // system::channel — sent straight through as a raw binary WS frame,
-    // same as v3. The server has no way to stamp a channel tag onto raw
-    // bytes, so it attributes an inbound binary frame to the connection's
-    // primary channel regardless of which channel sent it — meaningful
-    // sending is therefore only guaranteed on the primary channel.
+    // ArrayBuffer/TypedArray/Blob can't be tagged with system::channel as a
+    // raw WS binary frame — there's no room in it for the tag, and the
+    // server attributes any raw binary frame to the connection's primary
+    // channel. On the primary channel that's exactly right, so send it
+    // straight through, same as v3. On a secondary channel it would
+    // silently arrive on the wrong one, so it's base64-smuggled inside a
+    // JSON text frame instead — the receiving Connection unwraps it back
+    // into a `system::binary` ArrayBuffer on the right channel, transparent
+    // to app code either way.
     if (isBinaryPayload(data)) {
-      return this.socket.send(data);
+      if (this.isPrimary(channelId)) {
+        return this.socket.send(data);
+      }
+      return this._sendBinaryOnSecondaryChannel(channelId, data);
     }
 
     if (data && typeof data === 'object') {
@@ -315,7 +331,12 @@ export default class Connection {
       );
     }
 
-    if (event === 'system::binary') {
+    // A true binary frame arrives as `system::binary` (server-generated,
+    // always attributed to the primary channel — see Connection#send). A
+    // secondary-channel binary send arrives JSON-smuggled as PIE_BINARY_EVENT
+    // instead. Both decode and dispatch identically — app code listening for
+    // `system::binary` never sees the difference.
+    if (event === 'system::binary' || event === PIE_BINARY_EVENT) {
       const channelId = message['system::channel'] || this.primaryChannelId;
       const channel = this.channels[channelId] || this.channels[this.primaryChannelId];
       if (channel) {
@@ -431,5 +452,46 @@ export default class Connection {
       return Buffer.from(b64, 'base64');
     }
     return b64;
+  }
+
+  // Blob needs an async read to get at its bytes; everything else
+  // (ArrayBuffer/TypedArray) can be encoded synchronously. Either way ends
+  // up at _sendEncodedBinary — callers don't need to know which path ran.
+  _sendBinaryOnSecondaryChannel(channelId, data) {
+    if (typeof Blob !== 'undefined' && data instanceof Blob) {
+      return data.arrayBuffer()
+          .then((buf) => this._sendEncodedBinary(channelId, new Uint8Array(buf)))
+          .catch((e) => this.logger.error('PieSocket: failed to read Blob for binary send', e));
+    }
+
+    const bytes = data instanceof ArrayBuffer ?
+      new Uint8Array(data) :
+      new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
+    return this._sendEncodedBinary(channelId, bytes);
+  }
+
+  _sendEncodedBinary(channelId, bytes) {
+    return this.socket.send(JSON.stringify({
+      event: PIE_BINARY_EVENT,
+      'system::channel': channelId,
+      data: this._encodeBase64(bytes),
+    }));
+  }
+
+  _encodeBase64(bytes) {
+    if (typeof btoa === 'function') {
+      // Chunked to avoid blowing the call stack from spreading a huge
+      // array into String.fromCharCode at once.
+      let binary = '';
+      const chunkSize = 0x8000;
+      for (let i = 0; i < bytes.length; i += chunkSize) {
+        binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunkSize));
+      }
+      return btoa(binary);
+    }
+    if (typeof Buffer !== 'undefined') {
+      return Buffer.from(bytes).toString('base64');
+    }
+    throw new Error('PieSocket: no base64 encoder available in this environment');
   }
 }
