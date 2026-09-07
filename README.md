@@ -187,4 +187,4 @@ List of available methods on the `Channel` object
 Now you can interactively test the SDK, add features and fix bugs.
 
 
-Documentation: [PieSocket Realtime Docs](https://piesocket.com/docs)
+Documentation: [PieSocket Realtime Docs](https://piehost.com/docs)
