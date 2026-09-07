@@ -99,6 +99,31 @@ describe('Connection', () => {
     expect(lastFrame()).toEqual({event: 'chat', data: 'yo', 'system::channel': 'room-2'});
   });
 
+  it('sends an ArrayBuffer raw instead of JSON.stringify-ing it (regression)', () => {
+    // typeof arrayBuffer === 'object' is true — send() must check for a
+    // binary payload before falling into the generic object/JSON branch, or
+    // this silently sends "{}" instead of the actual bytes.
+    const conn = new Connection('wss://x/v4/room-1', {}, 'room-1');
+    lastSocket().onopen({});
+    mockSend.mockClear();
+
+    const buffer = new Uint8Array([1, 2, 3]).buffer;
+    conn.send('room-1', buffer);
+
+    expect(mockSend).toHaveBeenCalledWith(buffer);
+  });
+
+  it('sends a Uint8Array (TypedArray view) raw too', () => {
+    const conn = new Connection('wss://x/v4/room-1', {}, 'room-1');
+    lastSocket().onopen({});
+    mockSend.mockClear();
+
+    const bytes = new Uint8Array([1, 2, 3]);
+    conn.send('room-2', bytes);
+
+    expect(mockSend).toHaveBeenCalledWith(bytes);
+  });
+
   it('routes an inbound frame to the channel named by system::channel', () => {
     const conn = new Connection('wss://x/v4/room-1', {}, 'room-1');
     const primary = attach(conn, 'room-1', {primary: true});

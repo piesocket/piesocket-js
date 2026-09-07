@@ -13,6 +13,22 @@ const timeout = (fn, ms) => {
   return t;
 };
 
+// `typeof data === 'object'` is true for ArrayBuffer/Blob too, which would
+// otherwise fall into Connection#send's JSON.stringify path — checked first
+// so binary payloads never get mistaken for a plain object to encode.
+const isBinaryPayload = (data) => {
+  if (typeof ArrayBuffer !== 'undefined' && data instanceof ArrayBuffer) {
+    return true;
+  }
+  if (typeof Blob !== 'undefined' && data instanceof Blob) {
+    return true;
+  }
+  if (typeof ArrayBuffer !== 'undefined' && ArrayBuffer.isView(data)) {
+    return true; // TypedArrays (Uint8Array, etc.)
+  }
+  return false;
+};
+
 /**
  * A single WebSocket shared by many {@link Channel} handles (PieSocket v4).
  *
@@ -99,10 +115,20 @@ export default class Connection {
    * object (from Channel#publish) or a pre-serialised string (raw Channel#send
    * / blockchain payloads). Secondary channels get a `system::channel` tag.
    * @param {string} channelId
-   * @param {(object|string)} data
+   * @param {(object|string|ArrayBuffer|ArrayBufferView|Blob)} data
    * @return {*}
    */
   send(channelId, data) {
+    // ArrayBuffer/TypedArray/Blob can't be JSON-encoded or tagged with
+    // system::channel — sent straight through as a raw binary WS frame,
+    // same as v3. The server has no way to stamp a channel tag onto raw
+    // bytes, so it attributes an inbound binary frame to the connection's
+    // primary channel regardless of which channel sent it — meaningful
+    // sending is therefore only guaranteed on the primary channel.
+    if (isBinaryPayload(data)) {
+      return this.socket.send(data);
+    }
+
     if (data && typeof data === 'object') {
       const payload = this.isPrimary(channelId) ?
         data :

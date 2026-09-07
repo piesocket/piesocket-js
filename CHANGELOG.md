@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## v7.2.0 - 2026-09-07
+
+### Fixed
+- **Sending binary data (`ArrayBuffer`/`TypedArray`/`Blob`) on a v4 channel
+  was silently broken.** `Connection#send` checked `typeof data === 'object'`
+  before checking for a binary payload — true for `ArrayBuffer` too — so it
+  ran `JSON.stringify()` on the buffer (producing `"{}"`) instead of sending
+  the actual bytes. Binary sends now bypass the JSON path entirely and go
+  straight to the socket, same as v3. Only meaningful on the primary channel
+  of a multiplexed connection — the server has no way to stamp a
+  `system::channel` tag onto raw bytes, so it attributes an inbound binary
+  frame to the connection's primary channel regardless of which channel sent
+  it.
+
 ## v7.1.0 - 2026-09-05
 
 ### Changed
